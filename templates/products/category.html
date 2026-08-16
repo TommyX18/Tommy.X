@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} — TOMMY.X{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="tx-page-head">
+    <div class="tx-breadcrumb"><a href="{% url 'core:home' %}">Home</a> / {{ category.name }}</div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+    <h1 class="tx-page-title mb-0">{{ category.name }}</h1>
+    <form method="get" class="d-flex align-items-center gap-2">
+      {% for size in selected_sizes %}<input type="hidden" name="size" value="{{ size }}">{% endfor %}
+      {% if selected_stock %}<input type="hidden" name="stock" value="{{ selected_stock }}">{% endif %}
+      <label class="text-muted small text-uppercase" style="letter-spacing:.05em;">Sort by</label>
+      <select name="sort" class="tx-sort-select" onchange="this.form.submit()">
+        <option value="recent" {% if sort == 'recent' %}selected{% endif %}>Most Recent</option>
+        <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+        <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+        <option value="name_az" {% if sort == 'name_az' %}selected{% endif %}>Name: A-Z</option>
+        <option value="name_za" {% if sort == 'name_za' %}selected{% endif %}>Name: Z-A</option>
+        <option value="popularity" {% if sort == 'popularity' %}selected{% endif %}>Popularity</option>
+      </select>
+    </form>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-3">
+      <form method="get" class="tx-filters">
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <details class="tx-filter-group" open>
+          <summary><span><i class="bi bi-sliders"></i> Filters</span></summary>
+        </details>
+        <details class="tx-filter-group" open>
+          <summary>Stock Status</summary>
+          <div class="tx-filter-body">
+            <label><input type="radio" name="stock" value="" {% if not selected_stock %}checked{% endif %} onchange="this.form.submit()"> All</label>
+            <label><input type="radio" name="stock" value="in" {% if selected_stock == 'in' %}checked{% endif %} onchange="this.form.submit()"> In Stock</label>
+            <label><input type="radio" name="stock" value="out" {% if selected_stock == 'out' %}checked{% endif %} onchange="this.form.submit()"> Out of Stock</label>
+          </div>
+        </details>
+        <details class="tx-filter-group" open>
+          <summary>Size</summary>
+          <div class="tx-filter-body">
+            <label><input type="checkbox" name="size" value="XS" {% if 'XS' in selected_sizes %}checked{% endif %} onchange="this.form.submit()"> XS</label>
+            <label><input type="checkbox" name="size" value="S" {% if 'S' in selected_sizes %}checked{% endif %} onchange="this.form.submit()"> S</label>
+            <label><input type="checkbox" name="size" value="M" {% if 'M' in selected_sizes %}checked{% endif %} onchange="this.form.submit()"> M</label>
+            <label><input type="checkbox" name="size" value="L" {% if 'L' in selected_sizes %}checked{% endif %} onchange="this.form.submit()"> L</label>
+            <label><input type="checkbox" name="size" value="XL" {% if 'XL' in selected_sizes %}checked{% endif %} onchange="this.form.submit()"> XL</label>
+            <label><input type="checkbox" name="size" value="XXL" {% if 'XXL' in selected_sizes %}checked{% endif %} onchange="this.form.submit()"> XXL</label>
+          </div>
+        </details>
+        <details class="tx-filter-group" open>
+          <summary>Price Range</summary>
+          <div class="tx-filter-body">
+            <div class="d-flex gap-2">
+              <input type="number" name="price_min" placeholder="Min" class="form-control form-control-sm" value="{{ request.GET.price_min }}">
+              <input type="number" name="price_max" placeholder="Max" class="form-control form-control-sm" value="{{ request.GET.price_max }}">
+            </div>
+            <button type="submit" class="tx-btn-outline mt-2 btn btn-sm">Apply</button>
+          </div>
+        </details>
+      </form>
+    </div>
+
+    <div class="col-lg-9">
+      <div class="row g-4">
+        {% for product in products %}
+        <div class="col-6 col-lg-4">{% include 'partials/product_card.html' %}</div>
+        {% empty %}
+        <div class="col-12">
+          <p class="text-muted py-5 text-center">No products found. Try adjusting your filters, or add products for this category in the admin.</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>{% endif %}
+          {% for num in page_obj.paginator.page_range %}
+          <li class="page-item {% if num == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+          {% endfor %}
+          {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

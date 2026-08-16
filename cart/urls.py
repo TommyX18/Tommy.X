@@ -1,0 +1,13 @@
+from django.urls import path
+from . import views
+
+app_name = 'cart'
+
+urlpatterns = [
+    path('', views.cart_detail, name='detail'),
+    path('add/<int:variant_id>/', views.add_to_cart, name='add'),
+    path('update/<str:key>/', views.update_cart, name='update'),
+    path('remove/<str:key>/', views.remove_from_cart, name='remove'),
+    path('coupon/apply/', views.apply_coupon, name='apply_coupon'),
+    path('coupon/remove/', views.remove_coupon, name='remove_coupon'),
+]

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Login — TOMMY.X{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <h1 class="tx-page-title text-center">Login</h1>
+      <form method="post">
+        {% csrf_token %}
+        {% if form.errors %}<div class="alert alert-danger">Please check your username and password.</div>{% endif %}
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          <input type="text" name="username" class="form-control" required autofocus>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="tx-btn-primary w-100">Login</button>
+      </form>
+      <p class="text-center text-muted mt-3">New to TOMMY.X? <a href="{% url 'accounts:register' %}" style="color:var(--tx-orange);">Create an account</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

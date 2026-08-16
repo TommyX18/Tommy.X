@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Your Bag — TOMMY.X{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="tx-page-title">Your Bag</h1>
+
+  {% if cart|length == 0 %}
+    <div class="text-center py-5">
+      <i class="bi bi-bag" style="font-size:3rem;color:var(--tx-line);"></i>
+      <p class="text-muted mt-3">Your bag is empty.</p>
+      <a href="{% url 'core:home' %}" class="tx-btn-primary d-inline-block mt-2">Continue Shopping</a>
+    </div>
+  {% else %}
+  <div class="row g-5">
+    <div class="col-lg-8">
+      {% for line in cart %}
+      <div class="tx-cart-row">
+        <div class="tx-cart-img">
+          {% with img=line.product.primary_image %}
+          <img src="{% if img %}{{ img.image.url }}{% else %}https://placehold.co/200x260/f4f2ee/141414?text={{ line.product.name|urlencode }}{% endif %}" alt="{{ line.product.name }}">
+          {% endwith %}
+        </div>
+        <div class="flex-grow-1">
+          <p class="mb-1 fw-semibold">{{ line.product.name }}</p>
+          <p class="text-muted small mb-2">Size: {{ line.size }} &middot; Color: {{ line.color }}</p>
+          <form method="post" action="{% url 'cart:update' line.key %}" class="d-flex align-items-center gap-2">
+            {% csrf_token %}
+            <input type="number" name="quantity" value="{{ line.quantity }}" min="1" max="{{ line.max_stock }}" class="tx-qty-input">
+            <button type="submit" class="tx-btn-outline btn btn-sm">Update</button>
+          </form>
+          {% if line.quantity >= line.max_stock %}<p class="text-muted small mt-1 mb-0">Max available stock reached.</p>{% endif %}
+        </div>
+        <div class="text-end">
+          <p class="fw-semibold mb-2">Rs.{{ line.line_total|intcomma }}</p>
+          <form method="post" action="{% url 'cart:remove' line.key %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm text-danger"><i class="bi bi-trash"></i> Remove</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="col-lg-4">
+      <div class="tx-summary-card">
+        <h5 class="mb-3">Have a coupon?</h5>
+        {% if coupon %}
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="tx-badge-pill">{{ coupon.code }} applied</span>
+            <form method="post" action="{% url 'cart:remove_coupon' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm text-danger">Remove</button>
+            </form>
+          </div>
+        {% else %}
+          <form method="post" action="{% url 'cart:apply_coupon' %}" class="d-flex gap-2 mb-3">
+            {% csrf_token %}
+            <input type="text" name="code" class="form-control form-control-sm" placeholder="Enter coupon code">
+            <button type="submit" class="tx-btn-outline btn btn-sm">Apply</button>
+          </form>
+        {% endif %}
+        {% if totals.coupon_error %}<p class="text-danger small">{{ totals.coupon_error }}</p>{% endif %}
+
+        <h5 class="mb-3">Order Summary</h5>
+        <div class="tx-summary-row"><span>Subtotal</span><span>Rs.{{ totals.subtotal|intcomma }}</span></div>
+        {% if totals.discount > 0 %}<div class="tx-summary-row text-success"><span>Coupon Discount</span><span>-Rs.{{ totals.discount|intcomma }}</span></div>{% endif %}
+        <div class="tx-summary-row"><span>Shipping</span><span>{% if totals.shipping == 0 %}Free{% else %}Rs.{{ totals.shipping|intcomma }}{% endif %}</span></div>
+        <div class="tx-summary-row"><span>GST (5%)</span><span>Rs.{{ totals.gst|intcomma }}</span></div>
+        <div class="tx-summary-row tx-summary-total"><span>Grand Total</span><span>Rs.{{ totals.grand_total|intcomma }}</span></div>
+        <a href="{% url 'orders:checkout' %}" class="tx-btn-primary d-block text-center mt-3">Proceed to Checkout</a>
+        <p class="text-muted small mt-3 mb-0">Free shipping on orders above Rs.1,499. Online payment only. All orders are final — no returns are accepted.</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

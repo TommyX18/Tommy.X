@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Checkout — TOMMY.X{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="tx-page-title">Checkout</h1>
+  <div class="row g-5">
+    <div class="col-lg-7">
+      <h5 class="mb-3">Shipping Address</h5>
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Full Name</label>
+            {{ form.full_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Phone</label>
+            {{ form.phone }}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Email (optional)</label>
+            {{ form.email }}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Address Line 1</label>
+            {{ form.address_line1 }}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Address Line 2 (optional)</label>
+            {{ form.address_line2 }}
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">City</label>
+            {{ form.city }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">State</label>
+            {{ form.state }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Pincode</label>
+            {{ form.pincode }}
+          </div>
+        </div>
+
+        <hr class="my-4">
+        <h5 class="mb-3">Payment</h5>
+        <div class="border rounded p-3 mb-3" style="border-color:var(--tx-line)!important;">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment_method" id="payRazorpay" checked>
+            <label class="form-check-label" for="payRazorpay"><i class="bi bi-credit-card"></i> Razorpay (Cards / UPI / Netbanking)</label>
+          </div>
+          <p class="text-muted small mb-0 mt-2">Demo mode: this checkout simulates a successful Razorpay payment and creates a Payment record. No real charge is made — plug in real Razorpay Orders API + webhook verification when going live.</p>
+        </div>
+
+        <p class="text-muted small">All orders are final. No returns are accepted.</p>
+        <button type="submit" class="tx-btn-primary w-100">Place Order &amp; Pay Rs.{{ totals.grand_total|intcomma }}</button>
+      </form>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="tx-summary-card">
+        <h5 class="mb-3">Order Summary</h5>
+        {% for line in cart %}
+        <div class="d-flex justify-content-between small mb-2">
+          <span>{{ line.product.name }} ({{ line.size }}/{{ line.color }}) x{{ line.quantity }}</span>
+          <span>Rs.{{ line.line_total|intcomma }}</span>
+        </div>
+        {% endfor %}
+        <hr>
+        {% if coupon %}<div class="tx-summary-row"><span>Coupon</span><span class="tx-badge-pill">{{ coupon.code }}</span></div>{% endif %}
+        <div class="tx-summary-row"><span>Subtotal</span><span>Rs.{{ totals.subtotal|intcomma }}</span></div>
+        {% if totals.discount > 0 %}<div class="tx-summary-row text-success"><span>Discount</span><span>-Rs.{{ totals.discount|intcomma }}</span></div>{% endif %}
+        <div class="tx-summary-row"><span>Shipping</span><span>{% if totals.shipping == 0 %}Free{% else %}Rs.{{ totals.shipping|intcomma }}{% endif %}</span></div>
+        <div class="tx-summary-row"><span>GST (5%)</span><span>Rs.{{ totals.gst|intcomma }}</span></div>
+        <div class="tx-summary-row tx-summary-total"><span>Grand Total</span><span>Rs.{{ totals.grand_total|intcomma }}</span></div>
+        <p class="text-muted small mt-3 mb-0">Pan-India delivery. Online payment only. No returns or exchanges once placed.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

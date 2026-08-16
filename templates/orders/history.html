@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}My Orders — TOMMY.X{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="tx-page-title">My Orders</h1>
+  {% for order in orders %}
+  <div class="border rounded p-3 mb-3" style="border-color:var(--tx-line)!important;">
+    <div class="d-flex justify-content-between flex-wrap">
+      <div>
+        <strong>{{ order.order_number }}</strong>
+        <span class="text-muted small ms-2">{{ order.created_at|date:"d M Y" }}</span>
+      </div>
+      <div>
+        <span class="tx-badge-pill">{{ order.get_status_display }}</span>
+      </div>
+    </div>
+    <p class="mb-1 mt-2">Grand Total: Rs.{{ order.grand_total|intcomma }}</p>
+    <div class="d-flex gap-2">
+      <a href="{% url 'orders:success' order.order_number %}" class="tx-btn-outline btn btn-sm">View Invoice</a>
+      {% if order.status == 'placed' or order.status == 'confirmed' %}
+      <form method="post" action="{% url 'orders:cancel' order.order_number %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm text-danger">Cancel Order</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-muted">You haven't placed any orders yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

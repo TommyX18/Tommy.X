@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Add Address — TOMMY.X{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="tx-page-title">Add Address</h1>
+  <form method="post" style="max-width:600px;">
+    {% csrf_token %}
+    {% for field in form %}
+      {% if field.name == 'is_default' %}
+      <div class="form-check mb-3">
+        {{ field }}
+        <label class="form-check-label">{{ field.label }}</label>
+      </div>
+      {% else %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endif %}
+    {% endfor %}
+    <button type="submit" class="tx-btn-primary">Save Address</button>
+  </form>
+</div>
+{% endblock %}

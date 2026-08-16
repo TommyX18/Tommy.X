@@ -1,0 +1,195 @@
+{
+  "info": {
+    "name": "TOMMY.X API",
+    "description": "REST API collection for the TOMMY.X men's fashion e-commerce backend. Set {{base_url}} to your running server (default http://127.0.0.1:8000). Run 'Register' or 'Login' first — the tests script on those requests auto-saves {{access_token}} and {{refresh_token}} for every other request in this collection.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000" },
+    { "key": "access_token", "value": "" },
+    { "key": "refresh_token", "value": "" },
+    { "key": "variant_id", "value": "1" },
+    { "key": "product_id", "value": "1" },
+    { "key": "cart_key", "value": "1" },
+    { "key": "order_number", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/register/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"newcustomer\",\n  \"email\": \"newcustomer@example.com\",\n  \"password\": \"StrongPass123!\",\n  \"password2\": \"StrongPass123!\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var data = pm.response.json();",
+                "if (data.access) { pm.collectionVariables.set('access_token', data.access); }",
+                "if (data.refresh) { pm.collectionVariables.set('refresh_token', data.refresh); }"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"TommyX@2026\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var data = pm.response.json();",
+                "if (data.access) { pm.collectionVariables.set('access_token', data.access); }",
+                "if (data.refresh) { pm.collectionVariables.set('refresh_token', data.refresh); }"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/refresh/",
+            "body": { "mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}" }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["var d=pm.response.json(); if(d.access){pm.collectionVariables.set('access_token', d.access);}"] }
+          }]
+        },
+        {
+          "name": "Logout (blacklist refresh token)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/logout/",
+            "body": { "mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}" }
+          }
+        },
+        {
+          "name": "My Profile (Me)",
+          "request": { "method": "GET", "url": "{{base_url}}/api/auth/me/" }
+        }
+      ]
+    },
+    {
+      "name": "Catalog",
+      "item": [
+        { "name": "List Categories", "request": { "method": "GET", "url": "{{base_url}}/api/categories/" } },
+        { "name": "Category Detail", "request": { "method": "GET", "url": "{{base_url}}/api/categories/shirts/" } },
+        { "name": "Products in a Category", "request": { "method": "GET", "url": "{{base_url}}/api/categories/shirts/products/" } },
+        { "name": "List Products", "request": { "method": "GET", "url": "{{base_url}}/api/products/" } },
+        { "name": "Product Detail", "request": { "method": "GET", "url": "{{base_url}}/api/products/{{product_id}}/" } },
+        {
+          "name": "Filter Products (category + featured + price sort)",
+          "request": { "method": "GET", "url": "{{base_url}}/api/products/?category__slug=shirts&is_featured=true&ordering=price" }
+        },
+        { "name": "Search Products", "request": { "method": "GET", "url": "{{base_url}}/api/products/?search=shirt" } }
+      ]
+    },
+    {
+      "name": "Cart (session-based, works for guests too)",
+      "item": [
+        { "name": "View Cart", "request": { "method": "GET", "url": "{{base_url}}/api/cart/" } },
+        {
+          "name": "Add to Cart",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/cart/add/",
+            "body": { "mode": "raw", "raw": "{\n  \"variant_id\": {{variant_id}},\n  \"quantity\": 2\n}" }
+          }
+        },
+        {
+          "name": "Update Cart Line",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/cart/update/{{cart_key}}/",
+            "body": { "mode": "raw", "raw": "{\n  \"quantity\": 3\n}" }
+          }
+        },
+        { "name": "Remove Cart Line", "request": { "method": "DELETE", "url": "{{base_url}}/api/cart/remove/{{cart_key}}/" } }
+      ]
+    },
+    {
+      "name": "Wishlist (requires login)",
+      "item": [
+        { "name": "View Wishlist", "request": { "method": "GET", "url": "{{base_url}}/api/wishlist/" } },
+        {
+          "name": "Add to Wishlist",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/wishlist/",
+            "body": { "mode": "raw", "raw": "{\n  \"product_id\": {{product_id}}\n}" }
+          }
+        },
+        { "name": "Remove from Wishlist", "request": { "method": "DELETE", "url": "{{base_url}}/api/wishlist/remove/{{product_id}}/" } }
+      ]
+    },
+    {
+      "name": "Addresses (requires login)",
+      "item": [
+        { "name": "List My Addresses", "request": { "method": "GET", "url": "{{base_url}}/api/addresses/" } },
+        {
+          "name": "Add Address",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/addresses/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Charuu\",\n  \"phone\": \"9751999225\",\n  \"line1\": \"123 Main St\",\n  \"line2\": \"\",\n  \"city\": \"Chennai\",\n  \"state\": \"Tamil Nadu\",\n  \"pincode\": \"600001\",\n  \"is_default\": true\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders & Payments",
+      "item": [
+        {
+          "name": "Create Order (checkout from cart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/orders/create/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Charuu\",\n  \"phone\": \"9751999225\",\n  \"email\": \"tommy.xattire@gmail.com\",\n  \"address_line1\": \"123 Main St\",\n  \"city\": \"Chennai\",\n  \"state\": \"Tamil Nadu\",\n  \"pincode\": \"600001\",\n  \"coupon_code\": \"\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["var d=pm.response.json(); if(d.order_number){pm.collectionVariables.set('order_number', d.order_number);}"] }
+          }]
+        },
+        { "name": "List My Orders", "request": { "method": "GET", "url": "{{base_url}}/api/orders/" } },
+        { "name": "Order Detail", "request": { "method": "GET", "url": "{{base_url}}/api/orders/1/" } },
+        { "name": "Payment Status for an Order", "request": { "method": "GET", "url": "{{base_url}}/api/payments/{{order_number}}/" } }
+      ]
+    }
+  ]
+}

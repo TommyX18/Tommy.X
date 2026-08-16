@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Order Confirmed — TOMMY.X{% endblock %}
+{% block content %}
+<div class="container py-5" id="invoice">
+  <div class="text-center mb-4">
+    <i class="bi bi-check-circle-fill" style="font-size:3rem;color:var(--tx-orange);"></i>
+    <h1 class="tx-page-title mt-2 mb-0">Order Confirmed</h1>
+    <p class="text-muted">Thank you, {{ order.full_name }}! Your order <strong>{{ order.order_number }}</strong> has been placed.</p>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="border rounded p-4" style="border-color:var(--tx-line)!important;">
+        <div class="d-flex justify-content-between flex-wrap mb-3">
+          <div>
+            <h6 class="tx-footer-heading text-dark">Ship To</h6>
+            <p class="mb-0 small">{{ order.full_name }}<br>{{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}<br>{{ order.city }}, {{ order.state }} - {{ order.pincode }}<br>{{ order.phone }}</p>
+          </div>
+          <div class="text-md-end">
+            <h6 class="tx-footer-heading text-dark">Order Info</h6>
+            <p class="mb-0 small">Order #: {{ order.order_number }}<br>Date: {{ order.created_at|date:"d M Y, h:i A" }}<br>Status: {{ order.get_status_display }}<br>Payment: Paid via Razorpay</p>
+          </div>
+        </div>
+
+        <table class="table">
+          <thead><tr><th>Item</th><th>Size</th><th>Color</th><th>Qty</th><th class="text-end">Amount</th></tr></thead>
+          <tbody>
+            {% for item in order.items.all %}
+            <tr><td>{{ item.product_name }}</td><td>{{ item.size }}</td><td>{{ item.color }}</td><td>{{ item.quantity }}</td><td class="text-end">Rs.{{ item.line_total|intcomma }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="ms-auto" style="max-width:280px;">
+          <div class="tx-summary-row"><span>Subtotal</span><span>Rs.{{ order.subtotal|intcomma }}</span></div>
+          <div class="tx-summary-row"><span>Shipping</span><span>{% if order.shipping == 0 %}Free{% else %}Rs.{{ order.shipping|intcomma }}{% endif %}</span></div>
+          <div class="tx-summary-row"><span>GST</span><span>Rs.{{ order.gst|intcomma }}</span></div>
+          <div class="tx-summary-row tx-summary-total"><span>Grand Total</span><span>Rs.{{ order.grand_total|intcomma }}</span></div>
+        </div>
+      </div>
+
+      <div class="text-center mt-4 d-flex gap-3 justify-content-center flex-wrap">
+        <button onclick="window.print()" class="tx-btn-outline"><i class="bi bi-download"></i> Download / Print Invoice</button>
+        <a href="{% url 'core:home' %}" class="tx-btn-primary">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

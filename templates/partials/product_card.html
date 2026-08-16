@@ -1,0 +1,24 @@
+{% load humanize %}
+<div class="tx-product-card" data-aos>
+  <div class="tx-product-img-wrap">
+    {% if product.discount_percent > 0 %}<span class="tx-discount-tag">{{ product.discount_percent }}% OFF</span>{% endif %}
+    <form method="post" action="{% url 'wishlist:toggle' product.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button type="submit" class="tx-wish-btn" aria-label="Toggle wishlist">
+        <i class="bi bi-heart"></i>
+      </button>
+    </form>
+    <a href="{{ product.get_absolute_url }}">
+      {% with img=product.primary_image %}
+        {% if img %}<img src="{{ img.image.url }}" alt="{{ product.name }}">{% else %}<img src="https://placehold.co/450x600/f4f2ee/141414?text={{ product.name|urlencode }}" alt="{{ product.name }}">{% endif %}
+      {% endwith %}
+    </a>
+    {% if not product.in_stock %}<div class="tx-outofstock-tag">Out of Stock</div>{% endif %}
+  </div>
+  <p class="tx-product-name"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></p>
+  <div>
+    <span class="tx-price">Rs.{{ product.price|intcomma }}</span>
+    {% if product.mrp > product.price %}<span class="tx-mrp">Rs.{{ product.mrp|intcomma }}</span>{% endif %}
+  </div>
+</div>

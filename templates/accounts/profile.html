@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}My Profile — TOMMY.X{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="tx-page-title">My Account</h1>
+  <div class="row g-4">
+    <div class="col-lg-3">
+      <div class="list-group">
+        <a class="list-group-item list-group-item-action active" style="background:var(--tx-black);border-color:var(--tx-black);">Dashboard</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'orders:history' %}">Orders</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'accounts:addresses' %}">Addresses</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'wishlist:detail' %}">Wishlist</a>
+        <form method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="list-group-item list-group-item-action text-danger w-100 text-start border-0">Logout</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-lg-9">
+      <div class="border rounded p-4 mb-4" style="border-color:var(--tx-line)!important;">
+        <h5>Hi, {{ user.username }}</h5>
+        <p class="text-muted mb-0">{{ user.email }}</p>
+      </div>
+
+      <h6 class="tx-footer-heading text-dark">Recent Orders</h6>
+      {% for order in orders %}
+      <div class="border-bottom py-2 d-flex justify-content-between">
+        <span>{{ order.order_number }} <span class="text-muted small">({{ order.created_at|date:"d M Y" }})</span></span>
+        <span>Rs.{{ order.grand_total|intcomma }} · {{ order.get_status_display }}</span>
+      </div>
+      {% empty %}
+      <p class="text-muted">No orders yet.</p>
+      {% endfor %}
+      <a href="{% url 'orders:history' %}" class="tx-section-link d-inline-block mt-3">View all orders</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
