@@ -1,25 +1,752 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Login — TOMMY.X{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-5">
-      <h1 class="tx-page-title text-center">Login</h1>
-      <form method="post">
-        {% csrf_token %}
-        {% if form.errors %}<div class="alert alert-danger">Please check your username and password.</div>{% endif %}
-        <div class="mb-3">
-          <label class="form-label">Username</label>
-          <input type="text" name="username" class="form-control" required autofocus>
+
+<style>
+    .tx-login-page {
+        min-height: calc(100vh - 70px);
+        position: relative;
+        overflow: hidden;
+
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        padding: 60px 7%;
+
+        background:
+            linear-gradient(
+                90deg,
+                rgba(5, 5, 5, 0.18) 0%,
+                rgba(5, 5, 5, 0.42) 42%,
+                rgba(5, 5, 5, 0.92) 100%
+            ),
+            url("{% static 'img/login-backdrop.jpg' %}");
+
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+
+    /* Cinematic overlay */
+
+    .tx-login-page::before {
+        content: "";
+
+        position: absolute;
+        inset: 0;
+
+        background:
+            radial-gradient(
+                circle at 20% 50%,
+                rgba(255, 45, 45, 0.10),
+                transparent 35%
+            ),
+            linear-gradient(
+                180deg,
+                rgba(0, 0, 0, 0.08),
+                rgba(0, 0, 0, 0.45)
+            );
+
+        pointer-events: none;
+    }
+
+
+    /* LEFT BRANDING */
+
+    .tx-login-brand {
+        position: absolute;
+
+        left: 7%;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        z-index: 2;
+
+        max-width: 540px;
+    }
+
+
+    .tx-login-brand-small {
+        font-size: 12px;
+
+        font-weight: 600;
+
+        letter-spacing: 5px;
+
+        text-transform: uppercase;
+
+        color: rgba(255,255,255,.78);
+
+        margin-bottom: 22px;
+    }
+
+
+    .tx-login-brand h2 {
+        margin: 0;
+
+        font-size: clamp(55px, 7vw, 100px);
+
+        line-height: .86;
+
+        font-weight: 900;
+
+        letter-spacing: -5px;
+
+        color: #fff;
+    }
+
+
+    .tx-login-brand h2 span {
+        display: block;
+
+        color: var(--tx-orange, #ff3b30);
+    }
+
+
+    .tx-login-brand p {
+        margin-top: 30px;
+
+        max-width: 430px;
+
+        color: rgba(255,255,255,.70);
+
+        font-size: 15px;
+
+        line-height: 1.75;
+    }
+
+
+    /* LOGIN CARD */
+
+    .tx-login-card {
+        position: relative;
+
+        z-index: 3;
+
+        width: 100%;
+
+        max-width: 430px;
+
+        padding: 42px;
+
+        border: 1px solid rgba(255,255,255,.16);
+
+        border-radius: 4px;
+
+        background: rgba(12,12,12,.78);
+
+        backdrop-filter: blur(20px);
+
+        -webkit-backdrop-filter: blur(20px);
+
+        box-shadow:
+            0 30px 80px rgba(0,0,0,.60),
+            inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+
+    /* LOGO */
+
+    .tx-login-logo {
+        font-size: 25px;
+
+        font-weight: 900;
+
+        letter-spacing: 4px;
+
+        color: #fff;
+
+        margin-bottom: 42px;
+    }
+
+
+    .tx-login-logo span {
+        color: var(--tx-orange, #ff3b30);
+    }
+
+
+    /* TITLE */
+
+    .tx-login-title {
+        margin: 0 0 8px;
+
+        font-size: 32px;
+
+        font-weight: 800;
+
+        color: #fff;
+    }
+
+
+    .tx-login-subtitle {
+        color: rgba(255,255,255,.52);
+
+        font-size: 14px;
+
+        margin-bottom: 30px;
+
+        line-height: 1.6;
+    }
+
+
+    /* LABEL */
+
+    .tx-login-label {
+        display: block;
+
+        color: rgba(255,255,255,.75);
+
+        font-size: 12px;
+
+        font-weight: 600;
+
+        letter-spacing: 1px;
+
+        text-transform: uppercase;
+
+        margin-bottom: 9px;
+    }
+
+
+    /* INPUT */
+
+    .tx-login-input {
+        width: 100%;
+
+        height: 52px;
+
+        padding: 0 16px;
+
+        margin-bottom: 20px;
+
+        border: 1px solid rgba(255,255,255,.14);
+
+        border-radius: 2px;
+
+        background: rgba(0,0,0,.48);
+
+        color: #fff;
+
+        font-size: 14px;
+
+        outline: none;
+
+        transition: .25s ease;
+    }
+
+
+    .tx-login-input::placeholder {
+        color: rgba(255,255,255,.30);
+    }
+
+
+    .tx-login-input:focus {
+        border-color: var(--tx-orange, #ff3b30);
+
+        background: rgba(0,0,0,.65);
+
+        box-shadow:
+            0 0 0 3px rgba(255,59,48,.08);
+    }
+
+
+    /* PASSWORD */
+
+    .tx-password-wrap {
+        position: relative;
+    }
+
+
+    .tx-password-wrap .tx-login-input {
+        padding-right: 60px;
+    }
+
+
+    .tx-password-toggle {
+        position: absolute;
+
+        right: 14px;
+
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        border: 0;
+
+        background: transparent;
+
+        color: rgba(255,255,255,.45);
+
+        cursor: pointer;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        letter-spacing: 1px;
+
+        padding: 6px;
+    }
+
+
+    .tx-password-toggle:hover {
+        color: #fff;
+    }
+
+
+    /* OPTIONS */
+
+    .tx-login-options {
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        margin: 0 0 25px;
+    }
+
+
+    .tx-remember {
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        color: rgba(255,255,255,.45);
+
+        font-size: 12px;
+
+        cursor: pointer;
+    }
+
+
+    .tx-remember input {
+        accent-color: var(--tx-orange, #ff3b30);
+
+        cursor: pointer;
+    }
+
+
+    .tx-forgot {
+        color: rgba(255,255,255,.55);
+
+        font-size: 12px;
+
+        text-decoration: none;
+
+        transition: .2s ease;
+    }
+
+
+    .tx-forgot:hover {
+        color: #fff;
+    }
+
+
+    /* LOGIN BUTTON */
+
+    .tx-login-submit {
+        width: 100%;
+
+        height: 54px;
+
+        border: 0;
+
+        border-radius: 2px;
+
+        background: var(--tx-orange, #ff3b30);
+
+        color: #fff;
+
+        font-size: 13px;
+
+        font-weight: 800;
+
+        letter-spacing: 2px;
+
+        cursor: pointer;
+
+        transition: .25s ease;
+    }
+
+
+    .tx-login-submit:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 12px 30px rgba(255,59,48,.25);
+    }
+
+
+    .tx-login-submit:active {
+        transform: translateY(0);
+    }
+
+
+    /* ERROR */
+
+    .tx-login-error {
+        border: 1px solid rgba(255,70,70,.30);
+
+        background: rgba(255,50,50,.08);
+
+        color: #ff8b8b;
+
+        padding: 13px 14px;
+
+        font-size: 12px;
+
+        margin-bottom: 20px;
+
+        border-radius: 2px;
+
+        line-height: 1.5;
+    }
+
+
+    /* REGISTER */
+
+    .tx-register {
+        text-align: center;
+
+        margin-top: 30px;
+
+        color: rgba(255,255,255,.40);
+
+        font-size: 13px;
+    }
+
+
+    .tx-register a {
+        color: #fff;
+
+        text-decoration: none;
+
+        font-weight: 600;
+
+        transition: .2s ease;
+    }
+
+
+    .tx-register a:hover {
+        color: var(--tx-orange, #ff3b30);
+    }
+
+
+    /* BACK */
+
+    .tx-login-back {
+        display: block;
+
+        text-align: center;
+
+        margin-top: 22px;
+
+        color: rgba(255,255,255,.35);
+
+        font-size: 11px;
+
+        text-decoration: none;
+
+        letter-spacing: .5px;
+
+        transition: .2s ease;
+    }
+
+
+    .tx-login-back:hover {
+        color: #fff;
+    }
+
+
+    /* MOBILE */
+
+    @media (max-width: 900px) {
+
+        .tx-login-page {
+            justify-content: center;
+
+            padding: 40px 20px;
+
+            background-position: 38% center;
+        }
+
+
+        .tx-login-brand {
+            display: none;
+        }
+
+
+        .tx-login-card {
+            max-width: 440px;
+
+            padding: 35px 28px;
+        }
+    }
+
+
+    @media (max-width: 480px) {
+
+        .tx-login-page {
+            min-height: calc(100vh - 60px);
+
+            padding: 25px 15px;
+        }
+
+
+        .tx-login-card {
+            padding: 30px 22px;
+        }
+
+
+        .tx-login-title {
+            font-size: 27px;
+        }
+
+
+        .tx-login-logo {
+            margin-bottom: 32px;
+        }
+    }
+
+</style>
+
+
+<div class="tx-login-page">
+
+
+    <!-- LEFT SIDE BRANDING -->
+
+    <div class="tx-login-brand">
+
+        <div class="tx-login-brand-small">
+            TOMMY.X MEN'S WEAR
         </div>
-        <div class="mb-3">
-          <label class="form-label">Password</label>
-          <input type="password" name="password" class="form-control" required>
-        </div>
-        <button type="submit" class="tx-btn-primary w-100">Login</button>
-      </form>
-      <p class="text-center text-muted mt-3">New to TOMMY.X? <a href="{% url 'accounts:register' %}" style="color:var(--tx-orange);">Create an account</a></p>
+
+
+        <h2>
+            DEFINE
+            <span>YOUR STYLE.</span>
+        </h2>
+
+
+        <p>
+            Built for men who don't follow the crowd.
+            Discover premium fits, timeless silhouettes
+            and a style that speaks for itself.
+        </p>
+
     </div>
-  </div>
+
+
+
+    <!-- LOGIN CARD -->
+
+    <div class="tx-login-card">
+
+
+        <!-- LOGO -->
+
+        <div class="tx-login-logo">
+            TOMMY<span>.</span>X
+        </div>
+
+
+        <!-- TITLE -->
+
+        <h1 class="tx-login-title">
+            Welcome back.
+        </h1>
+
+
+        <p class="tx-login-subtitle">
+            Sign in to continue your TOMMY.X experience.
+        </p>
+
+
+
+        <!-- LOGIN ERROR -->
+
+        {% if form.errors %}
+
+            <div class="tx-login-error">
+                Invalid username or password.
+                Please check your details and try again.
+            </div>
+
+        {% endif %}
+
+
+
+        <!-- LOGIN FORM -->
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            <!-- USERNAME -->
+
+            <label
+                class="tx-login-label"
+                for="txUsername"
+            >
+                Username
+            </label>
+
+
+            <input
+                type="text"
+                name="username"
+                id="txUsername"
+                class="tx-login-input"
+                placeholder="Enter your username"
+                autocomplete="username"
+                required
+                autofocus
+            >
+
+
+
+            <!-- PASSWORD -->
+
+            <label
+                class="tx-login-label"
+                for="txPassword"
+            >
+                Password
+            </label>
+
+
+            <div class="tx-password-wrap">
+
+                <input
+                    type="password"
+                    name="password"
+                    id="txPassword"
+                    class="tx-login-input"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+
+                <button
+                    type="button"
+                    class="tx-password-toggle"
+                    onclick="togglePassword()"
+                >
+                    SHOW
+                </button>
+
+            </div>
+
+
+
+            <!-- OPTIONS -->
+
+            <div class="tx-login-options">
+
+                <label class="tx-remember">
+
+                    <input
+                        type="checkbox"
+                        name="remember"
+                    >
+
+                    <span>Remember me</span>
+
+                </label>
+
+
+                <a
+                    href="#"
+                    class="tx-forgot"
+                >
+                    Forgot password?
+                </a>
+
+            </div>
+
+
+
+            <!-- LOGIN BUTTON -->
+
+            <button
+                type="submit"
+                class="tx-login-submit"
+            >
+                SIGN IN
+            </button>
+
+        </form>
+
+
+
+        <!-- CREATE ACCOUNT -->
+
+        <div class="tx-register">
+
+            New to TOMMY.X?
+
+            <a href="{% url 'accounts:register' %}">
+                Create an account
+            </a>
+
+        </div>
+
+
+
+        <!-- BACK TO HOME -->
+
+        <a
+            href="/"
+            class="tx-login-back"
+        >
+            ← Back to TOMMY.X
+        </a>
+
+    </div>
+
 </div>
+
+
+
+<script>
+
+function togglePassword() {
+
+    const password =
+        document.getElementById("txPassword");
+
+    const button =
+        document.querySelector(".tx-password-toggle");
+
+
+    if (password.type === "password") {
+
+        password.type = "text";
+
+        button.textContent = "HIDE";
+
+    } else {
+
+        password.type = "password";
+
+        button.textContent = "SHOW";
+
+    }
+
+}
+
+</script>
+
 {% endblock %}

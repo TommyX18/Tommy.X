@@ -1,83 +1,741 @@
 {% extends 'base.html' %}
+
 {% load humanize %}
+
 {% block title %}Checkout — TOMMY.X{% endblock %}
+
 {% block content %}
+
 <div class="container py-4">
-  <h1 class="tx-page-title">Checkout</h1>
-  <div class="row g-5">
-    <div class="col-lg-7">
-      <h5 class="mb-3">Shipping Address</h5>
-      <form method="post">
-        {% csrf_token %}
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Full Name</label>
-            {{ form.full_name }}
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Phone</label>
-            {{ form.phone }}
-          </div>
-          <div class="col-12">
-            <label class="form-label">Email (optional)</label>
-            {{ form.email }}
-          </div>
-          <div class="col-12">
-            <label class="form-label">Address Line 1</label>
-            {{ form.address_line1 }}
-          </div>
-          <div class="col-12">
-            <label class="form-label">Address Line 2 (optional)</label>
-            {{ form.address_line2 }}
-          </div>
-          <div class="col-md-5">
-            <label class="form-label">City</label>
-            {{ form.city }}
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">State</label>
-            {{ form.state }}
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Pincode</label>
-            {{ form.pincode }}
-          </div>
+
+    <h1 class="tx-page-title">Checkout</h1>
+
+    <div class="row g-5">
+
+        <!-- ==================== LEFT SIDE ==================== -->
+        <div class="col-lg-7">
+
+            <h5 class="mb-3">Shipping Address</h5>
+
+            <form method="post" id="checkout-form">
+
+                {% csrf_token %}
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Full Name</label>
+                        {{ form.full_name }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Phone</label>
+                        {{ form.phone }}
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Email (optional)</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Address Line 1</label>
+                        {{ form.address_line1 }}
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Address Line 2 (optional)</label>
+                        {{ form.address_line2 }}
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="form-label">City</label>
+                        {{ form.city }}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">State</label>
+                        {{ form.state }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Pincode</label>
+                        {{ form.pincode }}
+                    </div>
+
+                </div>
+
+                <hr class="my-4">
+
+                <h5 class="mb-3">Payment</h5>
+
+                <div
+                    class="border rounded p-3 mb-3"
+                    style="border-color: var(--tx-line) !important;"
+                >
+
+                    <div class="form-check">
+
+                        <input
+                            class="form-check-input"
+                            type="radio"
+                            name="payment_method"
+                            id="payRazorpay"
+                            value="razorpay"
+                            checked
+                        >
+
+                        <label
+                            class="form-check-label"
+                            for="payRazorpay"
+                        >
+                            <i class="bi bi-credit-card"></i>
+                            Razorpay (Cards / UPI / Netbanking)
+                        </label>
+
+                    </div>
+
+                    <p class="text-muted small mb-0 mt-2">
+                        Secure Razorpay checkout. You will be redirected
+                        to the Razorpay payment window after your order
+                        details are validated.
+                    </p>
+
+                </div>
+
+                <!-- PAYMENT ERROR -->
+                <div
+                    id="payment-error"
+                    class="alert alert-danger d-none"
+                    role="alert"
+                ></div>
+
+                <p class="text-muted small">
+                    All orders are final. No returns are accepted.
+                </p>
+
+                <button
+                    type="submit"
+                    id="pay-button"
+                    class="tx-btn-primary w-100"
+                >
+                    PLACE ORDER &amp; PAY
+                    Rs.{{ totals.grand_total|intcomma }}
+                </button>
+
+            </form>
+
         </div>
 
-        <hr class="my-4">
-        <h5 class="mb-3">Payment</h5>
-        <div class="border rounded p-3 mb-3" style="border-color:var(--tx-line)!important;">
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="payment_method" id="payRazorpay" checked>
-            <label class="form-check-label" for="payRazorpay"><i class="bi bi-credit-card"></i> Razorpay (Cards / UPI / Netbanking)</label>
-          </div>
-          <p class="text-muted small mb-0 mt-2">Demo mode: this checkout simulates a successful Razorpay payment and creates a Payment record. No real charge is made — plug in real Razorpay Orders API + webhook verification when going live.</p>
+
+        <!-- ==================== RIGHT SIDE ==================== -->
+        <div class="col-lg-5">
+
+            <div class="tx-summary-card">
+
+                <h5 class="mb-3">Order Summary</h5>
+
+                {% for line in cart %}
+
+                <div class="d-flex justify-content-between small mb-2">
+
+                    <span>
+                        {{ line.product.name }}
+                        ({{ line.size }}/{{ line.color }})
+                        x{{ line.quantity }}
+                    </span>
+
+                    <span>
+                        Rs.{{ line.line_total|intcomma }}
+                    </span>
+
+                </div>
+
+                {% endfor %}
+
+                <hr>
+
+                {% if coupon %}
+
+                <div class="tx-summary-row">
+
+                    <span>Coupon</span>
+
+                    <span class="tx-badge-pill">
+                        {{ coupon.code }}
+                    </span>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="tx-summary-row">
+
+                    <span>Subtotal</span>
+
+                    <span>
+                        Rs.{{ totals.subtotal|intcomma }}
+                    </span>
+
+                </div>
+
+
+                {% if totals.discount > 0 %}
+
+                <div class="tx-summary-row text-success">
+
+                    <span>Discount</span>
+
+                    <span>
+                        -Rs.{{ totals.discount|intcomma }}
+                    </span>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="tx-summary-row">
+
+                    <span>Shipping</span>
+
+                    <span>
+
+                        {% if totals.shipping == 0 %}
+                            Free
+                        {% else %}
+                            Rs.{{ totals.shipping|intcomma }}
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <div class="tx-summary-row">
+
+                    <span>GST (5%)</span>
+
+                    <span>
+                        Rs.{{ totals.gst|intcomma }}
+                    </span>
+
+                </div>
+
+
+                <div class="tx-summary-row tx-summary-total">
+
+                    <span>Grand Total</span>
+
+                    <span>
+                        Rs.{{ totals.grand_total|intcomma }}
+                    </span>
+
+                </div>
+
+
+                <p class="text-muted small mt-3 mb-0">
+                    Pan-India delivery. Online payment only.
+                    No returns or exchanges once placed.
+                </p>
+
+            </div>
+
         </div>
 
-        <p class="text-muted small">All orders are final. No returns are accepted.</p>
-        <button type="submit" class="tx-btn-primary w-100">Place Order &amp; Pay Rs.{{ totals.grand_total|intcomma }}</button>
-      </form>
     </div>
 
-    <div class="col-lg-5">
-      <div class="tx-summary-card">
-        <h5 class="mb-3">Order Summary</h5>
-        {% for line in cart %}
-        <div class="d-flex justify-content-between small mb-2">
-          <span>{{ line.product.name }} ({{ line.size }}/{{ line.color }}) x{{ line.quantity }}</span>
-          <span>Rs.{{ line.line_total|intcomma }}</span>
-        </div>
-        {% endfor %}
-        <hr>
-        {% if coupon %}<div class="tx-summary-row"><span>Coupon</span><span class="tx-badge-pill">{{ coupon.code }}</span></div>{% endif %}
-        <div class="tx-summary-row"><span>Subtotal</span><span>Rs.{{ totals.subtotal|intcomma }}</span></div>
-        {% if totals.discount > 0 %}<div class="tx-summary-row text-success"><span>Discount</span><span>-Rs.{{ totals.discount|intcomma }}</span></div>{% endif %}
-        <div class="tx-summary-row"><span>Shipping</span><span>{% if totals.shipping == 0 %}Free{% else %}Rs.{{ totals.shipping|intcomma }}{% endif %}</span></div>
-        <div class="tx-summary-row"><span>GST (5%)</span><span>Rs.{{ totals.gst|intcomma }}</span></div>
-        <div class="tx-summary-row tx-summary-total"><span>Grand Total</span><span>Rs.{{ totals.grand_total|intcomma }}</span></div>
-        <p class="text-muted small mt-3 mb-0">Pan-India delivery. Online payment only. No returns or exchanges once placed.</p>
-      </div>
-    </div>
-  </div>
 </div>
+
+
+<!-- ========================================================= -->
+<!-- RAZORPAY CHECKOUT SCRIPT -->
+<!-- ========================================================= -->
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+<script>
+(function () {
+
+    "use strict";
+
+    const form = document.getElementById("checkout-form");
+    const button = document.getElementById("pay-button");
+    const errorBox = document.getElementById("payment-error");
+
+    const originalButtonText =
+        "PLACE ORDER & PAY Rs.{{ totals.grand_total|intcomma|escapejs }}";
+
+
+    /* =========================================================
+       SHOW ERROR
+    ========================================================= */
+
+    function showError(message) {
+
+        errorBox.textContent =
+            message || "Something went wrong. Please try again.";
+
+        errorBox.classList.remove("d-none");
+
+        button.disabled = false;
+
+        button.textContent = originalButtonText;
+    }
+
+
+    /* =========================================================
+       CLEAR ERROR
+    ========================================================= */
+
+    function clearError() {
+
+        errorBox.textContent = "";
+
+        errorBox.classList.add("d-none");
+    }
+
+
+    /* =========================================================
+       SUBMIT CHECKOUT FORM
+    ========================================================= */
+
+    form.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        clearError();
+
+        button.disabled = true;
+
+        button.textContent = "Creating secure payment...";
+
+
+        try {
+
+            /* =================================================
+               STEP 1
+               CREATE DJANGO ORDER
+               ================================================= */
+
+            const checkoutResponse = await fetch(
+                window.location.href,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+
+                    body: new FormData(form)
+                }
+            );
+
+
+            let checkoutData;
+
+            try {
+
+                checkoutData = await checkoutResponse.json();
+
+            } catch (jsonError) {
+
+                throw new Error(
+                    "The server returned an invalid response."
+                );
+
+            }
+
+
+            if (
+                !checkoutResponse.ok ||
+                !checkoutData.success
+            ) {
+
+                throw new Error(
+                    checkoutData.error ||
+                    "Unable to create your order."
+                );
+
+            }
+
+
+            if (!checkoutData.order_number) {
+
+                throw new Error(
+                    "Order number was not returned by the server."
+                );
+
+            }
+
+
+            console.log(
+                "Django order created:",
+                checkoutData.order_number
+            );
+
+
+            /* =================================================
+               STEP 2
+               CREATE RAZORPAY ORDER
+               ================================================= */
+
+            button.textContent =
+                "Starting Razorpay checkout...";
+
+
+            const paymentUrl =
+                '{% url "payments:create_payment" "ORDER_PLACEHOLDER" %}'
+                    .replace(
+                        "ORDER_PLACEHOLDER",
+                        encodeURIComponent(
+                            checkoutData.order_number
+                        )
+                    );
+
+
+            const paymentResponse = await fetch(
+                paymentUrl,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                }
+            );
+
+
+            let paymentData;
+
+            try {
+
+                paymentData =
+                    await paymentResponse.json();
+
+            } catch (jsonError) {
+
+                throw new Error(
+                    "Invalid response received while creating Razorpay payment."
+                );
+
+            }
+
+
+            if (!paymentResponse.ok) {
+
+                throw new Error(
+                    paymentData.error ||
+                    "Unable to start Razorpay checkout."
+                );
+
+            }
+
+
+            if (!paymentData.key) {
+
+                throw new Error(
+                    "Razorpay Key ID was not returned by the server."
+                );
+
+            }
+
+
+            if (!paymentData.razorpay_order_id) {
+
+                throw new Error(
+                    "Razorpay Order ID was not returned by the server."
+                );
+
+            }
+
+
+            console.log(
+                "Razorpay order created:",
+                paymentData.razorpay_order_id
+            );
+
+
+            /* =================================================
+               STEP 3
+               RAZORPAY OPTIONS
+               ================================================= */
+
+            const options = {
+
+                key: paymentData.key,
+
+                amount: paymentData.amount,
+
+                currency: paymentData.currency || "INR",
+
+                name: paymentData.name || "TOMMY.X",
+
+                description:
+                    paymentData.description ||
+                    "TOMMY.X Order",
+
+                order_id:
+                    paymentData.razorpay_order_id,
+
+
+                /* ---------------------------------------------
+                   CUSTOMER PREFILL
+                   --------------------------------------------- */
+
+                prefill:
+                    paymentData.prefill || {},
+
+
+                /* ---------------------------------------------
+                   THEME
+                   --------------------------------------------- */
+
+                theme: {
+                    color: "#e85d1f"
+                },
+
+
+                /* ---------------------------------------------
+                   PAYMENT SUCCESS
+                   --------------------------------------------- */
+
+                handler: async function (response) {
+
+                    console.log(
+                        "Razorpay payment successful:",
+                        response
+                    );
+
+
+                    button.disabled = true;
+
+                    button.textContent =
+                        "Verifying payment...";
+
+
+                    try {
+
+                        const verifyForm =
+                            new FormData();
+
+
+                        verifyForm.append(
+                            "razorpay_order_id",
+                            response.razorpay_order_id
+                        );
+
+
+                        verifyForm.append(
+                            "razorpay_payment_id",
+                            response.razorpay_payment_id
+                        );
+
+
+                        verifyForm.append(
+                            "razorpay_signature",
+                            response.razorpay_signature
+                        );
+
+
+                        const verifyResponse =
+                            await fetch(
+                                '{% url "payments:verify_payment" %}',
+                                {
+                                    method: "POST",
+
+                                    headers: {
+                                        "X-CSRFToken":
+                                            "{{ csrf_token }}",
+
+                                        "X-Requested-With":
+                                            "XMLHttpRequest"
+                                    },
+
+                                    body: verifyForm
+                                }
+                            );
+
+
+                        let verifyData;
+
+                        try {
+
+                            verifyData =
+                                await verifyResponse.json();
+
+                        } catch (jsonError) {
+
+                            throw new Error(
+                                "Invalid response received during payment verification."
+                            );
+
+                        }
+
+
+                        if (
+                            !verifyResponse.ok ||
+                            !verifyData.success
+                        ) {
+
+                            throw new Error(
+                                verifyData.error ||
+                                "Payment verification failed."
+                            );
+
+                        }
+
+
+                        if (!verifyData.order_number) {
+
+                            throw new Error(
+                                "Order number was not returned after verification."
+                            );
+
+                        }
+
+
+                        console.log(
+                            "Payment verified successfully."
+                        );
+
+
+                        /* -------------------------------------
+                           REDIRECT TO SUCCESS PAGE
+                           ------------------------------------- */
+
+                        window.location.href =
+                            '{% url "orders:success" "ORDER_PLACEHOLDER" %}'
+                                .replace(
+                                    "ORDER_PLACEHOLDER",
+                                    encodeURIComponent(
+                                        verifyData.order_number
+                                    )
+                                );
+
+                    } catch (verificationError) {
+
+                        console.error(
+                            "Payment verification error:",
+                            verificationError
+                        );
+
+                        showError(
+                            verificationError.message ||
+                            "Payment verification failed."
+                        );
+
+                    }
+
+                },
+
+
+                /* ---------------------------------------------
+                   MODAL
+                   --------------------------------------------- */
+
+                modal: {
+
+                    ondismiss: function () {
+
+                        console.log(
+                            "Razorpay checkout closed."
+                        );
+
+                        button.disabled = false;
+
+                        button.textContent =
+                            originalButtonText;
+
+                    }
+
+                }
+
+            };
+
+
+            /* =================================================
+               STEP 4
+               CREATE RAZORPAY INSTANCE
+               ================================================= */
+
+            if (
+                typeof Razorpay === "undefined"
+            ) {
+
+                throw new Error(
+                    "Razorpay Checkout failed to load. Please check your internet connection."
+                );
+
+            }
+
+
+            const razorpay =
+                new Razorpay(options);
+
+
+            /* =================================================
+               PAYMENT FAILED
+               ================================================= */
+
+            razorpay.on(
+                "payment.failed",
+                function (response) {
+
+                    console.error(
+                        "Razorpay payment failed:",
+                        response
+                    );
+
+
+                    const error =
+                        response &&
+                        response.error
+                            ? response.error
+                            : null;
+
+
+                    const description =
+                        error &&
+                        error.description
+                            ? error.description
+                            : "Payment failed. Please try again.";
+
+
+                    showError(description);
+
+                }
+            );
+
+
+            /* =================================================
+               OPEN RAZORPAY
+               ================================================= */
+
+            razorpay.open();
+
+        } catch (error) {
+
+            console.error(
+                "Checkout error:",
+                error
+            );
+
+
+            showError(
+                error.message ||
+                "Something went wrong. Please try again."
+            );
+
+        }
+
+    });
+
+})();
+</script>
+
 {% endblock %}

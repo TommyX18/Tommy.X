@@ -1,12 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% static 'img/hero-placeholder.jpg' as hero_image %}
+
 {% block content %}
 
-<section class="tx-hero" style="background-image: url('{% static 'img/hero-placeholder.jpg' %}');">
+<section class="tx-hero" style="background-image: url('{{ hero_image }}');">
   <div class="tx-hero-inner">
     <div class="tx-hero-sub">MEN&nbsp;·&nbsp;PREMIUM</div>
-    <h1 class="tx-hero-title">TOMMY<span style="color:var(--tx-orange)">.X</span></h1>
-    <a href="{% url 'products:new_arrivals' %}" class="tx-hero-cta">Shop New Arrivals <i class="bi bi-arrow-right"></i></a>
+
+    <h1 class="tx-hero-title">
+      TOMMY<span style="color:var(--tx-orange)">.X</span>
+    </h1>
+
+    <a href="{% url 'products:new_arrivals' %}" class="tx-hero-cta">
+      Shop New Arrivals
+      <i class="bi bi-arrow-right"></i>
+    </a>
   </div>
 </section>
 
@@ -15,11 +25,15 @@
     <div class="tx-section-head" data-aos>
       <h2 class="tx-section-title">Shop by Category</h2>
     </div>
+
     <div class="row g-3">
       {% for cat in categories %}
       <div class="col-6 col-lg-4" data-aos>
         <a href="{{ cat.get_absolute_url }}" class="tx-cat-tile">
-          <img src="https://placehold.co/500x650/141414/e85d1f?text={{ cat.name|urlencode }}" alt="{{ cat.name }}">
+          <img
+            src="https://placehold.co/500x650/141414/e85d1f?text={{ cat.name|urlencode }}"
+            alt="{{ cat.name }}"
+          >
           <span class="tx-cat-tile-label">{{ cat.name }}</span>
         </a>
       </div>
@@ -34,11 +48,16 @@
       <h2 class="tx-section-title">Featured Products</h2>
       <a href="{% url 'products:new_arrivals' %}" class="tx-section-link">View All</a>
     </div>
+
     <div class="row g-4">
       {% for product in featured %}
-      <div class="col-6 col-lg-3">{% include 'partials/product_card.html' %}</div>
+      <div class="col-6 col-lg-3">
+        {% include 'partials/product_card.html' %}
+      </div>
       {% empty %}
-      <p class="text-muted">Featured products will appear here once added in the admin.</p>
+      <p class="text-muted">
+        Featured products will appear here once added in the admin.
+      </p>
       {% endfor %}
     </div>
   </div>
@@ -47,108 +66,201 @@
 <section class="tx-section">
   <div class="container">
     <div class="row align-items-center g-4">
+
       <div class="col-lg-6" data-aos>
-        <img src="https://placehold.co/900x600/f4f2ee/141414?text=TOMMY.X+Offer" class="img-fluid rounded" alt="Offer">
+        <img
+          src="https://placehold.co/900x600/f4f2ee/141414?text=TOMMY.X+Offer"
+          class="img-fluid rounded"
+          alt="Offer"
+        >
       </div>
+
       <div class="col-lg-6" data-aos>
         <div class="tx-badge-pill mb-3">Limited Time</div>
-        <h2 class="tx-section-title mb-3">Up to 40% Off Selected Styles</h2>
-        <p class="text-muted mb-4">Refresh your wardrobe with premium shirts, pants and tees — pan-India delivery, secure online payment.</p>
-        <a href="{% url 'core:offers' %}" class="tx-btn-primary d-inline-block">Shop Offers</a>
+
+        <h2 class="tx-section-title mb-3">
+          Up to 40% Off Selected Styles
+        </h2>
+
+        <p class="text-muted mb-4">
+          Refresh your wardrobe with premium shirts, pants and tees —
+          pan-India delivery, secure online payment.
+        </p>
+
+        <a href="{% url 'core:offers' %}" class="tx-btn-primary d-inline-block">
+          Shop Offers
+        </a>
       </div>
+
     </div>
   </div>
 </section>
 
 <section class="tx-section tx-section-alt">
   <div class="container">
+
     <div class="tx-section-head" data-aos>
       <h2 class="tx-section-title">New Arrivals</h2>
-      <a href="{% url 'products:new_arrivals' %}" class="tx-section-link">View All</a>
+      <a href="{% url 'products:new_arrivals' %}" class="tx-section-link">
+        View All
+      </a>
     </div>
+
     <div class="row g-4">
       {% for product in new_arrivals %}
-      <div class="col-6 col-lg-3">{% include 'partials/product_card.html' %}</div>
+      <div class="col-6 col-lg-3">
+        {% include 'partials/product_card.html' %}
+      </div>
       {% empty %}
-      <p class="text-muted">Mark products as "New Arrival" in the admin to feature them here.</p>
+      <p class="text-muted">
+        Mark products as "New Arrival" in the admin to feature them here.
+      </p>
       {% endfor %}
     </div>
+
   </div>
 </section>
 
 <section class="tx-section">
   <div class="container">
+
     <div class="tx-section-head" data-aos>
       <h2 class="tx-section-title">Best Sellers</h2>
     </div>
+
     <div class="row g-4">
       {% for product in best_sellers %}
-      <div class="col-6 col-lg-3">{% include 'partials/product_card.html' %}</div>
+      <div class="col-6 col-lg-3">
+        {% include 'partials/product_card.html' %}
+      </div>
       {% empty %}
-      <p class="text-muted">Add products in the admin to see them here.</p>
+      <p class="text-muted">
+        Add products in the admin to see them here.
+      </p>
       {% endfor %}
     </div>
+
   </div>
 </section>
 
 <section class="tx-section tx-section-alt">
   <div class="container">
+
     <div class="tx-section-head" data-aos>
       <h2 class="tx-section-title">Our Story</h2>
     </div>
+
     <div class="row align-items-center g-4">
+
       <div class="col-lg-6" data-aos>
-        <p class="fs-5 text-muted">TOMMY.X was built for men who dress with intent — clean silhouettes, honest fabric, and a wardrobe that works as hard as you do. Every piece is designed in-house and shipped pan-India, with secure online payment.</p>
+        <p class="fs-5 text-muted">
+          TOMMY.X was built for men who dress with intent — clean silhouettes,
+          honest fabric, and a wardrobe that works as hard as you do.
+          Every piece is designed in-house and shipped pan-India,
+          with secure online payment.
+        </p>
       </div>
+
       <div class="col-lg-6" data-aos>
-        <img src="https://placehold.co/900x600/141414/ffffff?text=Brand+Story" class="img-fluid rounded" alt="Brand story">
+        <img
+          src="https://placehold.co/900x600/141414/ffffff?text=Brand+Story"
+          class="img-fluid rounded"
+          alt="Brand story"
+        >
       </div>
+
     </div>
   </div>
 </section>
 
 <section class="tx-section">
   <div class="container">
+
     <div class="tx-section-head" data-aos>
       <h2 class="tx-section-title">What Customers Say</h2>
     </div>
+
     <div class="row g-4">
       {% for t in "123" %}
       <div class="col-md-4" data-aos>
         <div class="tx-testimonial">
-          <div class="text-warning mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-          <p class="mb-3">"Fit is spot on and the fabric feels premium. Delivery was quick across the country."</p>
+
+          <div class="text-warning mb-2">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+          </div>
+
+          <p class="mb-3">
+            "Fit is spot on and the fabric feels premium.
+            Delivery was quick across the country."
+          </p>
+
           <strong>Verified Buyer</strong>
+
         </div>
       </div>
       {% endfor %}
     </div>
+
   </div>
 </section>
 
 <section class="tx-section tx-section-alt">
   <div class="container">
+
     <div class="tx-section-head" data-aos>
       <h2 class="tx-section-title">@tommy.x on Instagram</h2>
     </div>
+
     <div class="row g-2">
       {% for i in "123456" %}
       <div class="col-6 col-lg-2">
-        <img src="https://placehold.co/300x300/f4f2ee/141414?text=%40tommy.x" class="img-fluid" alt="Instagram post">
+        <img
+          src="https://placehold.co/300x300/f4f2ee/141414?text=%40tommy.x"
+          class="img-fluid"
+          alt="Instagram post"
+        >
       </div>
       {% endfor %}
     </div>
+
   </div>
 </section>
 
 <section class="tx-newsletter">
   <div class="container">
-    <h2 class="tx-section-title mb-2">Join the TOMMY.X List</h2>
-    <p class="text-white-50 mb-4">New drops, offers and restocks — straight to your inbox.</p>
-    <form class="d-flex justify-content-center flex-wrap gap-2" action="{% url 'core:contact' %}" method="get">
-      <input type="email" placeholder="Your email address" required>
-      <button type="submit" class="tx-btn-primary" style="background:var(--tx-orange);border-color:var(--tx-orange);">Subscribe</button>
+
+    <h2 class="tx-section-title mb-2">
+      Join the TOMMY.X List
+    </h2>
+
+    <p class="text-white-50 mb-4">
+      New drops, offers and restocks — straight to your inbox.
+    </p>
+
+    <form
+      class="d-flex justify-content-center flex-wrap gap-2"
+      action="{% url 'core:contact' %}"
+      method="get"
+    >
+      <input
+        type="email"
+        placeholder="Your email address"
+        required
+      >
+
+      <button
+        type="submit"
+        class="tx-btn-primary"
+        style="background:var(--tx-orange);border-color:var(--tx-orange);"
+      >
+        Subscribe
+      </button>
     </form>
+
   </div>
 </section>
 

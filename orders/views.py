@@ -24,7 +24,7 @@ def checkout_view(request):
         messages.info(request, 'Your bag is empty.')
         return redirect('cart:detail')
 
-    # Validate stock for every line before allowing checkout
+    # Validate stock before creating a pending order.
     for line in cart:
         if line['quantity'] > line['max_stock']:
             messages.error(request, f"Only {line['max_stock']} left for {line['product'].name} ({line['size']}/{line['color']}). Please update your bag.")
@@ -55,12 +55,16 @@ def checkout_view(request):
         form = CheckoutForm(request.POST, initial=initial)
         if form.is_valid():
             data = form.cleaned_data
+
             with transaction.atomic():
-                # Re-validate stock inside the transaction (never trust client state)
+                # Re-check stock immediately before creating the order.
                 for line in cart:
                     variant = line['variant']
                     variant.refresh_from_db()
                     if line['quantity'] > variant.stock_quantity:
+                        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                            from django.http import JsonResponse
+                            return JsonResponse({'error': f"{line['product'].name} ({line['size']}/{line['color']}) no longer has enough stock."}, status=409)
                         messages.error(request, f"{line['product'].name} ({line['size']}/{line['color']}) no longer has enough stock.")
                         return redirect('cart:detail')
 
@@ -81,49 +85,58 @@ def checkout_view(request):
                     shipping=totals['shipping'],
                     gst=totals['gst'],
                     grand_total=totals['grand_total'],
-                    payment_method='razorpay_demo',
-                    is_paid=True,
-                    status='confirmed',
+                    payment_method='razorpay',
+                    is_paid=False,
+                    status='placed',
                 )
+
                 for line in cart:
-                    variant = line['variant']
                     OrderItem.objects.create(
                         order=order,
                         product=line['product'],
-                        variant=variant,
+                        variant=line['variant'],
                         product_name=line['product'].name,
                         size=line['size'],
                         color=line['color'],
                         price=line['unit_price'],
                         quantity=line['quantity'],
                     )
-                    variant.stock_quantity -= line['quantity']
-                    variant.save(update_fields=['stock_quantity'])
-
-                if coupon:
-                    coupon.times_used += 1
-                    coupon.save(update_fields=['times_used'])
 
                 Payment.objects.create(
                     order=order,
                     provider='razorpay',
-                    provider_order_id=f'order_demo_{order.order_number}',
-                    provider_payment_id=f'pay_demo_{uuid.uuid4().hex[:12]}',
                     amount=order.grand_total,
-                    status='paid',
+                    status='pending',
                 )
 
-            cart.clear()
-            request.session.pop('coupon_code', None)
-            return redirect('orders:success', order_number=order.order_number)
+            request.session['pending_order_number'] = order.order_number
+            request.session.modified = True
+
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                from django.http import JsonResponse
+                return JsonResponse({
+                    'success': True,
+                    'order_number': order.order_number,
+                }, status=201)
+
+            messages.info(request, 'Your order was created. Complete the Razorpay payment to confirm it.')
+            return redirect('orders:checkout')
     else:
         form = CheckoutForm(initial=initial)
 
-    return render(request, 'orders/checkout.html', {'form': form, 'cart': cart, 'totals': totals, 'coupon': coupon})
+    return render(request, 'orders/checkout.html', {
+        'form': form,
+        'cart': cart,
+        'totals': totals,
+        'coupon': coupon,
+    })
 
 
 def order_success(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
+    if not order.is_paid:
+        messages.info(request, 'Payment is not confirmed for this order yet.')
+        return redirect('orders:checkout')
     return render(request, 'orders/success.html', {'order': order})
 
 

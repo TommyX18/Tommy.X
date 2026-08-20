@@ -33,6 +33,8 @@ urlpatterns = [
 
     # Orders / Payments
     path('orders/create/', views.CreateOrderView.as_view(), name='api-order-create'),
+    path('payments/create/', views.CreatePaymentView.as_view(), name='api-payment-create'),
+    path('payments/verify/', views.VerifyPaymentView.as_view(), name='api-payment-verify'),
     path('payments/<str:order_number>/', views.PaymentDetailView.as_view(), name='api-payment-detail'),
 
     path('', include(router.urls)),
