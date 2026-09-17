@@ -1,189 +1,1244 @@
 {% extends 'base.html' %}
 {% load humanize %}
+
 {% block title %}{{ product.name }} — TOMMY.X{% endblock %}
+
 {% block content %}
+
 <div class="container py-4">
-  <div class="tx-breadcrumb mb-3">
-    <a href="{% url 'core:home' %}">Home</a> / <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a> / {{ product.name }}
-  </div>
 
-  <div class="row g-5">
-    <div class="col-lg-6">
-      <div class="tx-pd-gallery-main" id="txPdMainWrap">
-        {% with img=product.primary_image %}
-        <img id="txPdMainImg" src="{% if img %}{{ img.image.url }}{% else %}https://placehold.co/700x900/f4f2ee/141414?text={{ product.name|urlencode }}{% endif %}" alt="{{ product.name }}">
-        {% endwith %}
-      </div>
-      {% if product.images.count > 1 %}
-      <div class="row g-2">
-        {% for img in product.images.all %}
-        <div class="col-3">
-          <div class="tx-pd-thumb {% if forloop.first %}active{% endif %}" data-full="{{ img.image.url }}">
-            <img src="{{ img.image.url }}" alt="{{ product.name }}">
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
+    <!-- =========================================================
+         BREADCRUMB
+         ========================================================= -->
+
+    <div class="tx-breadcrumb mb-3">
+
+        <a href="{% url 'core:home' %}">
+            Home
+        </a>
+
+        /
+
+        <a href="{{ product.category.get_absolute_url }}">
+            {{ product.category.name }}
+        </a>
+
+        /
+
+        {{ product.name }}
+
     </div>
 
-    <div class="col-lg-6">
-      <p class="text-uppercase text-muted small mb-1" style="letter-spacing:.1em;">{{ product.category.name }} · SKU {{ product.sku }}</p>
-      <h1 class="fw-semibold mb-2" style="font-size:1.8rem;">{{ product.name }}</h1>
-      <div class="mb-3">
-        <span class="fs-4 fw-semibold">Rs.{{ product.price|intcomma }}</span>
-        {% if product.original_price > product.price %}
-          <span class="tx-mrp fs-6">Rs.{{ product.original_price|intcomma }}</span>
-          <span class="tx-badge-pill ms-2">{{ product.discount_percentage }}% OFF</span>
-        {% endif %}
-        <p class="text-muted small mb-0 mt-1">Inclusive of GST. Shipping calculated at checkout.</p>
-      </div>
 
-      {% if product.in_stock %}<p class="text-success small"><i class="bi bi-check-circle"></i> In Stock</p>
-      {% else %}<p class="text-danger small"><i class="bi bi-x-circle"></i> Out of Stock</p>{% endif %}
+    <div class="row g-5">
 
-      {% if product.variants.exists %}
-      <form method="post" action="{% url 'cart:add' 0 %}" id="txAddToCartForm">
-        {% csrf_token %}
-        <input type="hidden" name="next" id="txNextField" value="{{ request.path }}">
-        <input type="hidden" name="variant_id" id="txSelectedVariant" value="">
+        <!-- =========================================================
+             PRODUCT IMAGE
+             ========================================================= -->
 
-        <div class="mb-3">
-          <label class="form-label text-uppercase small fw-semibold" style="letter-spacing:.05em;">Color</label>
-          <div class="d-flex gap-2 flex-wrap" id="txColorOptions">
-            {% for color in product.available_colors %}
-            <label class="tx-size-swatch" data-color="{{ color.name }}">
-              <input type="radio" name="color_choice" value="{{ color.name }}" {% if forloop.first %}checked{% endif %}>
-              {{ color.name }}
-            </label>
-            {% endfor %}
-          </div>
-        </div>
+        <div class="col-lg-6">
 
-        <div class="mb-4">
-          <label class="form-label text-uppercase small fw-semibold" style="letter-spacing:.05em;">Size</label>
-          <div class="d-flex gap-2 flex-wrap" id="txSizeOptions">
-            {% for size in product.available_sizes %}
-            <label class="tx-size-swatch" data-size="{{ size.name }}">
-              <input type="radio" name="size_choice" value="{{ size.name }}" {% if forloop.first %}checked{% endif %}>
-              {{ size.name }}
-            </label>
-            {% endfor %}
-          </div>
-          <p class="small mt-2 mb-0" id="txStockNote"></p>
-        </div>
+            <div
+                class="tx-pd-gallery-main"
+                id="txPdMainWrap"
+            >
 
-        <div class="mb-4 d-flex align-items-center gap-3">
-          <label class="form-label text-uppercase small fw-semibold mb-0" style="letter-spacing:.05em;">Qty</label>
-          <input type="number" name="quantity" id="txQtyInput" value="1" min="1" class="tx-qty-input">
-        </div>
+                {% with img=product.primary_image %}
 
-        <div class="d-flex gap-3 flex-wrap">
-          <button type="submit" class="tx-btn-primary" id="txAddToCartBtn">
-            <i class="bi bi-bag-plus"></i> Add to Cart
-          </button>
-          <button type="submit" class="tx-btn-outline" id="txBuyNowBtn" onclick="document.getElementById('txNextField').value='{% url 'orders:checkout' %}'; return true;">
-            Buy Now
-          </button>
-        </div>
-      </form>
+                    {% if img %}
 
-      <script>
-        (function(){
-          const variantData = {{ variant_json|safe }};
-          const form = document.getElementById('txAddToCartForm');
-          const selectedVariantInput = document.getElementById('txSelectedVariant');
-          const stockNote = document.getElementById('txStockNote');
-          const qtyInput = document.getElementById('txQtyInput');
-          const addBtn = document.getElementById('txAddToCartBtn');
+                        <img
+                            id="txPdMainImg"
+                            src="{{ img.image.url }}"
+                            alt="{{ product.name }}"
+                        >
 
-          function getSelected() {
-            const size = form.querySelector('input[name="size_choice"]:checked');
-            const color = form.querySelector('input[name="color_choice"]:checked');
-            return { size: size ? size.value : null, color: color ? color.value : null };
-          }
+                    {% else %}
 
-          function updateVariant() {
-            const { size, color } = getSelected();
-            const match = variantData.find(v => v.size === size && v.color === color);
-            if (match) {
-              selectedVariantInput.value = match.id;
-              qtyInput.max = match.stock;
-              if (match.stock > 0) {
-                stockNote.textContent = match.stock + ' in stock';
-                stockNote.className = 'small mt-2 mb-0 text-success';
-                addBtn.disabled = false;
-              } else {
-                stockNote.textContent = 'Out of stock in this size/color';
-                stockNote.className = 'small mt-2 mb-0 text-danger';
-                addBtn.disabled = true;
-              }
-              form.action = form.action.replace(/\/add\/\d+\//, '/add/' + match.id + '/');
-            } else {
-              selectedVariantInput.value = '';
-              stockNote.textContent = 'This combination is not available';
-              stockNote.className = 'small mt-2 mb-0 text-danger';
-              addBtn.disabled = true;
-            }
-          }
+                        <img
+                            id="txPdMainImg"
+                            src="https://placehold.co/700x900/f4f2ee/141414?text={{ product.name|urlencode }}"
+                            alt="{{ product.name }}"
+                        >
 
-          form.querySelectorAll('input[name="size_choice"], input[name="color_choice"]').forEach(function (el) {
-            el.addEventListener('change', updateVariant);
-          });
-          updateVariant();
-        })();
-      </script>
-      {% else %}
-      <p class="text-danger">This product currently has no sizes/colors configured.</p>
-      {% endif %}
+                    {% endif %}
 
-      <hr class="my-4">
-      <div class="accordion" id="pdAccordion">
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pdDesc">Description</button>
-          </h2>
-          <div id="pdDesc" class="accordion-collapse collapse show" data-bs-parent="#pdAccordion">
-            <div class="accordion-body">{{ product.description|default:"Crafted for everyday wear — clean lines, honest fabric, made to last." }}</div>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pdSpec">Specifications</button>
-          </h2>
-          <div id="pdSpec" class="accordion-collapse collapse" data-bs-parent="#pdAccordion">
-            <div class="accordion-body">
-              <ul class="mb-0">
-                <li>Brand: {{ product.brand }}</li>
-                <li>SKU: {{ product.sku }}</li>
-                <li>Category: {{ product.category.name }}</li>
-              </ul>
+                {% endwith %}
+
             </div>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pdShip">Shipping &amp; Returns</button>
-          </h2>
-          <div id="pdShip" class="accordion-collapse collapse" data-bs-parent="#pdAccordion">
-            <div class="accordion-body">Pan-India delivery. Online payment only. All orders are final — no returns are accepted. Please check the size guide before ordering.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  {% if related %}
-  <div class="tx-section">
-    <div class="tx-section-head">
-      <h2 class="tx-section-title">You May Also Like</h2>
+
+            {% if product.images.count > 1 %}
+
+                <div class="row g-2 mt-2">
+
+                    {% for img in product.images.all %}
+
+                        <div class="col-3">
+
+                            <div
+                                class="tx-pd-thumb {% if forloop.first %}active{% endif %}"
+                                data-full="{{ img.image.url }}"
+                            >
+
+                                <img
+                                    src="{{ img.image.url }}"
+                                    alt="{{ product.name }}"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =========================================================
+             PRODUCT INFORMATION
+             ========================================================= -->
+
+        <div class="col-lg-6">
+
+            <!-- CATEGORY / SKU -->
+
+            <p
+                class="text-uppercase text-muted small mb-1"
+                style="letter-spacing:.1em;"
+            >
+                {{ product.category.name }}
+                · SKU {{ product.sku }}
+            </p>
+
+
+            <!-- PRODUCT NAME -->
+
+            <h1
+                class="fw-semibold mb-2"
+                style="font-size:1.8rem;"
+            >
+                {{ product.name }}
+            </h1>
+
+
+            <!-- =====================================================
+                 PRICE
+                 ===================================================== -->
+
+            <div class="mb-3">
+
+                <span class="fs-4 fw-semibold">
+                    Rs.{{ product.price|intcomma }}
+                </span>
+
+
+                {% if product.original_price > product.price %}
+
+                    <span class="tx-mrp fs-6">
+                        Rs.{{ product.original_price|intcomma }}
+                    </span>
+
+                    <span class="tx-badge-pill ms-2">
+                        {{ product.discount_percentage }}% OFF
+                    </span>
+
+                {% endif %}
+
+
+                <p class="text-muted small mb-0 mt-1">
+                    Inclusive of GST.
+                    Shipping calculated at checkout.
+                </p>
+
+            </div>
+
+
+            <!-- =====================================================
+                 PRODUCT STOCK
+                 ===================================================== -->
+
+            {% if product.in_stock %}
+
+                <p class="text-success small">
+                    <i class="bi bi-check-circle"></i>
+                    In Stock
+                </p>
+
+            {% else %}
+
+                <p class="text-danger small">
+                    <i class="bi bi-x-circle"></i>
+                    Out of Stock
+                </p>
+
+            {% endif %}
+
+
+            {% if product.variants.exists %}
+
+                <!-- =================================================
+                     PRODUCT FORM
+                     ================================================= -->
+
+                <form
+                    method="post"
+                    action="{% url 'cart:add' 0 %}"
+                    id="txProductForm"
+                >
+
+                    {% csrf_token %}
+
+
+                    <!-- Selected variant -->
+
+                    <input
+                        type="hidden"
+                        name="variant_id"
+                        id="txSelectedVariant"
+                        value=""
+                    >
+
+
+                    <!-- Normal Add to Cart redirect -->
+
+                    <input
+                        type="hidden"
+                        name="next"
+                        id="txNextField"
+                        value="{{ request.path }}"
+                    >
+
+
+                    <!-- =================================================
+                         COLOR
+                         ================================================= -->
+
+                    <div class="mb-3">
+
+                        <label
+                            class="form-label text-uppercase small fw-semibold"
+                            style="letter-spacing:.05em;"
+                        >
+                            Color
+                        </label>
+
+
+                        <div
+                            class="d-flex gap-2 flex-wrap"
+                            id="txColorOptions"
+                        >
+
+                            {% for color in product.available_colors %}
+
+                                <label
+                                    class="tx-size-swatch"
+                                    data-color="{{ color.name }}"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="color_choice"
+                                        value="{{ color.name }}"
+                                        {% if forloop.first %}checked{% endif %}
+                                    >
+
+                                    {{ color.name }}
+
+                                </label>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         SIZE
+                         ================================================= -->
+
+                    <div class="mb-4">
+
+                        <label
+                            class="form-label text-uppercase small fw-semibold"
+                            style="letter-spacing:.05em;"
+                        >
+                            Size
+                        </label>
+
+
+                        <div
+                            class="d-flex gap-2 flex-wrap"
+                            id="txSizeOptions"
+                        >
+
+                            {% for size in product.available_sizes %}
+
+                                <label
+                                    class="tx-size-swatch"
+                                    data-size="{{ size.name }}"
+                                >
+
+                                    <input
+                                        type="radio"
+                                        name="size_choice"
+                                        value="{{ size.name }}"
+                                        {% if forloop.first %}checked{% endif %}
+                                    >
+
+                                    {{ size.name }}
+
+                                </label>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <p
+                            class="small mt-2 mb-0"
+                            id="txStockNote"
+                        ></p>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         QUANTITY
+                         ================================================= -->
+
+                    <div
+                        class="mb-4 d-flex align-items-center gap-3"
+                    >
+
+                        <label
+                            class="form-label text-uppercase small fw-semibold mb-0"
+                            style="letter-spacing:.05em;"
+                        >
+                            Qty
+                        </label>
+
+
+                        <input
+                            type="number"
+                            name="quantity"
+                            id="txQtyInput"
+                            value="1"
+                            min="1"
+                            class="tx-qty-input"
+                        >
+
+                    </div>
+
+
+                    <!-- =================================================
+                         BUTTONS
+                         ================================================= -->
+
+                    <div class="d-flex gap-3 flex-wrap">
+
+                        <!-- ADD TO CART -->
+
+                        <button
+                            type="button"
+                            class="tx-btn-primary"
+                            id="txAddToCartBtn"
+                        >
+
+                            <i class="bi bi-bag-plus"></i>
+
+                            Add to Cart
+
+                        </button>
+
+
+                        <!-- BUY NOW -->
+
+                        <button
+                            type="button"
+                            class="tx-btn-outline"
+                            id="txBuyNowBtn"
+                        >
+
+                            <i class="bi bi-lightning-charge"></i>
+
+                            Buy Now
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <!-- =====================================================
+                     JAVASCRIPT
+                     ===================================================== -->
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+
+                        "use strict";
+
+
+                        /* =====================================================
+                           ELEMENTS
+                           ===================================================== */
+
+                        const form = document.getElementById("txProductForm");
+
+                        const selectedVariantInput =
+                            document.getElementById("txSelectedVariant");
+
+                        const stockNote =
+                            document.getElementById("txStockNote");
+
+                        const qtyInput =
+                            document.getElementById("txQtyInput");
+
+                        const addBtn =
+                            document.getElementById("txAddToCartBtn");
+
+                        const buyNowBtn =
+                            document.getElementById("txBuyNowBtn");
+
+
+                        /* =====================================================
+                           CHECK ELEMENTS
+                           ===================================================== */
+
+                        if (
+                            !form ||
+                            !selectedVariantInput ||
+                            !stockNote ||
+                            !qtyInput ||
+                            !addBtn ||
+                            !buyNowBtn
+                        ) {
+
+                            console.error(
+                                "TOMMY.X: Product form elements not found."
+                            );
+
+                            return;
+                        }
+
+
+                        /* =====================================================
+                           LOAD VARIANT DATA
+
+                           variant_json is already JSON from Django view.
+                           We keep it inside a JS string and parse it safely.
+                           ===================================================== */
+
+                        let variants = [];
+
+                        try {
+
+                            variants = JSON.parse(
+                                '{{ variant_json|escapejs }}'
+                            );
+
+                            if (!Array.isArray(variants)) {
+                                throw new Error(
+                                    "Variant data is not an array."
+                                );
+                            }
+
+                        } catch (error) {
+
+                            console.error(
+                                "TOMMY.X: Variant JSON error:",
+                                error
+                            );
+
+                            stockNote.textContent =
+                                "Unable to load product variants.";
+
+                            stockNote.className =
+                                "small mt-2 mb-0 text-danger";
+
+                            addBtn.disabled = true;
+                            buyNowBtn.disabled = true;
+
+                            return;
+                        }
+
+
+                        console.log(
+                            "TOMMY.X: Variants loaded:",
+                            variants
+                        );
+
+
+                        /* =====================================================
+                           URLS
+                           ===================================================== */
+
+                        const cartUrlTemplate =
+                            "{% url 'cart:add' 0 %}";
+
+                        const buyNowUrl =
+                            "{% url 'products:buy_now' product.slug %}";
+
+
+                        console.log(
+                            "TOMMY.X: Cart URL template:",
+                            cartUrlTemplate
+                        );
+
+                        console.log(
+                            "TOMMY.X: Buy Now URL:",
+                            buyNowUrl
+                        );
+
+
+                        /* =====================================================
+                           GET SELECTED COLOR
+                           ===================================================== */
+
+                        function getColor() {
+
+                            const selected =
+                                form.querySelector(
+                                    'input[name="color_choice"]:checked'
+                                );
+
+                            return selected
+                                ? selected.value
+                                : "";
+                        }
+
+
+                        /* =====================================================
+                           GET SELECTED SIZE
+                           ===================================================== */
+
+                        function getSize() {
+
+                            const selected =
+                                form.querySelector(
+                                    'input[name="size_choice"]:checked'
+                                );
+
+                            return selected
+                                ? selected.value
+                                : "";
+                        }
+
+
+                        /* =====================================================
+                           FIND MATCHING VARIANT
+                           ===================================================== */
+
+                        function getSelectedVariant() {
+
+                            const color = getColor();
+                            const size = getSize();
+
+
+                            console.log(
+                                "TOMMY.X: Selected color:",
+                                color
+                            );
+
+                            console.log(
+                                "TOMMY.X: Selected size:",
+                                size
+                            );
+
+
+                            return variants.find(function (variant) {
+
+                                return (
+                                    String(variant.color).trim().toLowerCase()
+                                    ===
+                                    String(color).trim().toLowerCase()
+
+                                    &&
+
+                                    String(variant.size).trim().toLowerCase()
+                                    ===
+                                    String(size).trim().toLowerCase()
+                                );
+
+                            }) || null;
+                        }
+
+
+                        /* =====================================================
+                           BUILD CART URL
+                           ===================================================== */
+
+                        function buildCartUrl(variantId) {
+
+                            return cartUrlTemplate.replace(
+                                "/0/",
+                                "/" + variantId + "/"
+                            );
+                        }
+
+
+                        /* =====================================================
+                           UPDATE VARIANT UI
+                           ===================================================== */
+
+                        function updateVariant() {
+
+                            const variant =
+                                getSelectedVariant();
+
+
+                            /* ---------------------------------------------
+                               NO MATCHING VARIANT
+                               --------------------------------------------- */
+
+                            if (!variant) {
+
+                                selectedVariantInput.value = "";
+
+                                stockNote.textContent =
+                                    "This size/color combination is not available.";
+
+                                stockNote.className =
+                                    "small mt-2 mb-0 text-danger";
+
+                                addBtn.disabled = true;
+                                buyNowBtn.disabled = true;
+
+                                return;
+                            }
+
+
+                            /* ---------------------------------------------
+                               SAVE VARIANT ID
+                               --------------------------------------------- */
+
+                            selectedVariantInput.value =
+                                variant.id;
+
+
+                            /* ---------------------------------------------
+                               STOCK
+                               --------------------------------------------- */
+
+                            const stock =
+                                Number(variant.stock || 0);
+
+
+                            qtyInput.max = stock;
+
+
+                            /* ---------------------------------------------
+                               OUT OF STOCK
+                               --------------------------------------------- */
+
+                            if (stock <= 0) {
+
+                                stockNote.textContent =
+                                    "Out of stock in this size/color.";
+
+                                stockNote.className =
+                                    "small mt-2 mb-0 text-danger";
+
+                                addBtn.disabled = true;
+                                buyNowBtn.disabled = true;
+
+                                return;
+                            }
+
+
+                            /* ---------------------------------------------
+                               AVAILABLE
+                               --------------------------------------------- */
+
+                            stockNote.textContent =
+                                stock + " in stock";
+
+                            stockNote.className =
+                                "small mt-2 mb-0 text-success";
+
+                            addBtn.disabled = false;
+                            buyNowBtn.disabled = false;
+
+
+                            /* ---------------------------------------------
+                               FIX QUANTITY
+                               --------------------------------------------- */
+
+                            let quantity =
+                                Number(qtyInput.value || 1);
+
+
+                            if (quantity < 1) {
+                                quantity = 1;
+                            }
+
+
+                            if (quantity > stock) {
+                                quantity = stock;
+                            }
+
+
+                            qtyInput.value = quantity;
+                        }
+
+
+                        /* =====================================================
+                           SIZE CHANGE
+                           ===================================================== */
+
+                        form.querySelectorAll(
+                            'input[name="size_choice"]'
+                        ).forEach(function (element) {
+
+                            element.addEventListener(
+                                "change",
+                                updateVariant
+                            );
+
+                        });
+
+
+                        /* =====================================================
+                           COLOR CHANGE
+                           ===================================================== */
+
+                        form.querySelectorAll(
+                            'input[name="color_choice"]'
+                        ).forEach(function (element) {
+
+                            element.addEventListener(
+                                "change",
+                                updateVariant
+                            );
+
+                        });
+
+
+                        /* =====================================================
+                           QUANTITY CHANGE
+                           ===================================================== */
+
+                        qtyInput.addEventListener(
+                            "change",
+                            function () {
+
+                                const variant =
+                                    getSelectedVariant();
+
+
+                                if (!variant) {
+                                    return;
+                                }
+
+
+                                const stock =
+                                    Number(variant.stock || 0);
+
+
+                                let quantity =
+                                    Number(qtyInput.value || 1);
+
+
+                                if (quantity < 1) {
+                                    quantity = 1;
+                                }
+
+
+                                if (quantity > stock) {
+                                    quantity = stock;
+                                }
+
+
+                                qtyInput.value = quantity;
+
+                            }
+                        );
+
+
+                        /* =====================================================
+                           ADD TO CART
+                           ===================================================== */
+
+                        addBtn.addEventListener(
+                            "click",
+                            function () {
+
+                                console.log(
+                                    "TOMMY.X: Add to Cart clicked"
+                                );
+
+
+                                const variant =
+                                    getSelectedVariant();
+
+
+                                /* -----------------------------------------
+                                   VALIDATE VARIANT
+                                   ----------------------------------------- */
+
+                                if (!variant) {
+
+                                    stockNote.textContent =
+                                        "Please select a valid size and color.";
+
+                                    stockNote.className =
+                                        "small mt-2 mb-0 text-danger";
+
+                                    return;
+                                }
+
+
+                                /* -----------------------------------------
+                                   STOCK
+                                   ----------------------------------------- */
+
+                                const stock =
+                                    Number(variant.stock || 0);
+
+
+                                if (stock <= 0) {
+
+                                    stockNote.textContent =
+                                        "This combination is out of stock.";
+
+                                    stockNote.className =
+                                        "small mt-2 mb-0 text-danger";
+
+                                    return;
+                                }
+
+
+                                /* -----------------------------------------
+                                   QUANTITY
+                                   ----------------------------------------- */
+
+                                const quantity =
+                                    Number(qtyInput.value || 1);
+
+
+                                if (
+                                    quantity < 1 ||
+                                    quantity > stock
+                                ) {
+
+                                    stockNote.textContent =
+                                        "Please select a quantity between 1 and "
+                                        + stock
+                                        + ".";
+
+                                    stockNote.className =
+                                        "small mt-2 mb-0 text-danger";
+
+                                    return;
+                                }
+
+
+                                /* -----------------------------------------
+                                   SAVE VARIANT
+                                   ----------------------------------------- */
+
+                                selectedVariantInput.value =
+                                    variant.id;
+
+
+                                /* -----------------------------------------
+                                   BUILD CART URL
+                                   ----------------------------------------- */
+
+                                const cartUrl =
+                                    buildCartUrl(variant.id);
+
+
+                                console.log(
+                                    "TOMMY.X: Variant ID:",
+                                    variant.id
+                                );
+
+                                console.log(
+                                    "TOMMY.X: Quantity:",
+                                    quantity
+                                );
+
+                                console.log(
+                                    "TOMMY.X: Add to Cart URL:",
+                                    cartUrl
+                                );
+
+
+                                /* -----------------------------------------
+                                   SET FORM ACTION
+                                   ----------------------------------------- */
+
+                                form.action = cartUrl;
+
+
+                                /* -----------------------------------------
+                                   NORMAL CART REDIRECT
+                                   ----------------------------------------- */
+
+                                document.getElementById(
+                                    "txNextField"
+                                ).value = window.location.pathname;
+
+
+                                /* -----------------------------------------
+                                   SUBMIT FORM
+
+                                   Native submit avoids calling the click
+                                   handler again.
+                                   ----------------------------------------- */
+
+                                HTMLFormElement.prototype.submit.call(form);
+
+                            }
+                        );
+
+
+                        /* =====================================================
+                           BUY NOW
+                           ===================================================== */
+
+                        buyNowBtn.addEventListener(
+                            "click",
+                            function () {
+
+                                console.log(
+                                    "TOMMY.X: Buy Now clicked"
+                                );
+
+
+                                const variant =
+                                    getSelectedVariant();
+
+
+                                /* -----------------------------------------
+                                   VALIDATE VARIANT
+                                   ----------------------------------------- */
+
+                                if (!variant) {
+
+                                    stockNote.textContent =
+                                        "Please select a valid size and color.";
+
+                                    stockNote.className =
+                                        "small mt-2 mb-0 text-danger";
+
+                                    return;
+                                }
+
+
+                                /* -----------------------------------------
+                                   STOCK
+                                   ----------------------------------------- */
+
+                                const stock =
+                                    Number(variant.stock || 0);
+
+
+                                if (stock <= 0) {
+
+                                    stockNote.textContent =
+                                        "This combination is out of stock.";
+
+                                    stockNote.className =
+                                        "small mt-2 mb-0 text-danger";
+
+                                    return;
+                                }
+
+
+                                /* -----------------------------------------
+                                   QUANTITY
+                                   ----------------------------------------- */
+
+                                const quantity =
+                                    Number(qtyInput.value || 1);
+
+
+                                if (
+                                    quantity < 1 ||
+                                    quantity > stock
+                                ) {
+
+                                    stockNote.textContent =
+                                        "Please select a quantity between 1 and "
+                                        + stock
+                                        + ".";
+
+                                    stockNote.className =
+                                        "small mt-2 mb-0 text-danger";
+
+                                    return;
+                                }
+
+
+                                /* -----------------------------------------
+                                   SAVE VARIANT
+                                   ----------------------------------------- */
+
+                                selectedVariantInput.value =
+                                    variant.id;
+
+
+                                /* -----------------------------------------
+                                   SET BUY NOW ACTION
+                                   ----------------------------------------- */
+
+                                form.action = buyNowUrl;
+
+
+                                console.log(
+                                    "TOMMY.X: Buy Now Product:",
+                                    "{{ product.name|escapejs }}"
+                                );
+
+                                console.log(
+                                    "TOMMY.X: Buy Now Variant ID:",
+                                    variant.id
+                                );
+
+                                console.log(
+                                    "TOMMY.X: Buy Now Quantity:",
+                                    quantity
+                                );
+
+                                console.log(
+                                    "TOMMY.X: Buy Now URL:",
+                                    buyNowUrl
+                                );
+
+
+                                /* -----------------------------------------
+                                   DISABLE BUTTON
+                                   ----------------------------------------- */
+
+                                buyNowBtn.disabled = true;
+
+                                buyNowBtn.innerHTML =
+                                    '<i class="bi bi-arrow-repeat"></i> Processing...';
+
+
+                                /* -----------------------------------------
+                                   SUBMIT FORM
+                                   ----------------------------------------- */
+
+                                HTMLFormElement.prototype.submit.call(form);
+
+                            }
+                        );
+
+
+                        /* =====================================================
+                           INITIAL LOAD
+                           ===================================================== */
+
+                        updateVariant();
+
+
+                        console.log(
+                            "TOMMY.X: Product page initialized successfully."
+                        );
+
+                    });
+                </script>
+
+
+            {% else %}
+
+                <p class="text-danger">
+                    This product currently has no
+                    sizes/colors configured.
+                </p>
+
+            {% endif %}
+
+
+            <!-- =========================================================
+                 ACCORDION
+                 ========================================================= -->
+
+            <hr class="my-4">
+
+
+            <div
+                class="accordion"
+                id="pdAccordion"
+            >
+
+                <!-- DESCRIPTION -->
+
+                <div class="accordion-item">
+
+                    <h2 class="accordion-header">
+
+                        <button
+                            class="accordion-button"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#pdDesc"
+                        >
+                            Description
+                        </button>
+
+                    </h2>
+
+
+                    <div
+                        id="pdDesc"
+                        class="accordion-collapse collapse show"
+                        data-bs-parent="#pdAccordion"
+                    >
+
+                        <div class="accordion-body">
+
+                            {{ product.description|default:"Crafted for everyday wear — clean lines, honest fabric, made to last." }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SPECIFICATIONS -->
+
+                <div class="accordion-item">
+
+                    <h2 class="accordion-header">
+
+                        <button
+                            class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#pdSpec"
+                        >
+                            Specifications
+                        </button>
+
+                    </h2>
+
+
+                    <div
+                        id="pdSpec"
+                        class="accordion-collapse collapse"
+                        data-bs-parent="#pdAccordion"
+                    >
+
+                        <div class="accordion-body">
+
+                            <ul class="mb-0">
+
+                                <li>
+                                    Brand:
+                                    {{ product.brand }}
+                                </li>
+
+                                <li>
+                                    SKU:
+                                    {{ product.sku }}
+                                </li>
+
+                                <li>
+                                    Category:
+                                    {{ product.category.name }}
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SHIPPING -->
+
+                <div class="accordion-item">
+
+                    <h2 class="accordion-header">
+
+                        <button
+                            class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#pdShip"
+                        >
+                            Shipping &amp; Returns
+                        </button>
+
+                    </h2>
+
+
+                    <div
+                        id="pdShip"
+                        class="accordion-collapse collapse"
+                        data-bs-parent="#pdAccordion"
+                    >
+
+                        <div class="accordion-body">
+
+                            Pan-India delivery.
+                            Online payment only.
+                            All orders are final — no returns are accepted.
+                            Please check the size guide before ordering.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-    <div class="row g-4">
-      {% for product in related %}
-      <div class="col-6 col-lg-3">{% include 'partials/product_card.html' %}</div>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
+
+
+    <!-- =========================================================
+         RELATED PRODUCTS
+         ========================================================= -->
+
+    {% if related %}
+
+        <div class="tx-section">
+
+            <div class="tx-section-head">
+
+                <h2 class="tx-section-title">
+                    You May Also Like
+                </h2>
+
+            </div>
+
+
+            <div class="row g-4">
+
+                {% for product in related %}
+
+                    <div class="col-6 col-lg-3">
+
+                        {% include 'partials/product_card.html' %}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
 </div>
+
 {% endblock %}

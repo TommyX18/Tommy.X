@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="tx-section">
+  <div class="container">
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+
+        <div class="text-center mb-5">
+          <span class="tx-premium-kicker">
+            SECURE CHECKOUT
+          </span>
+
+          <h1 class="tx-premium-heading mt-2">
+            How would you like to continue?
+          </h1>
+
+          <p class="text-muted mt-3">
+            Choose an option to continue with your purchase.
+          </p>
+        </div>
+
+        <div class="row g-4">
+
+          <!-- Guest -->
+          <div class="col-md-6">
+            <div class="tx-checkout-choice">
+
+              <div class="tx-checkout-choice-icon">
+                <i class="bi bi-person"></i>
+              </div>
+
+              <h3>Continue as Guest</h3>
+
+              <p>
+                Checkout quickly without creating an account.
+              </p>
+
+              <a
+                href="{% url 'orders:checkout' %}"
+                class="tx-btn-primary w-100 d-block text-center"
+              >
+                Continue as Guest
+              </a>
+
+            </div>
+          </div>
+
+
+          <!-- Sign in -->
+          <div class="col-md-6">
+            <div class="tx-checkout-choice">
+
+              <div class="tx-checkout-choice-icon">
+                <i class="bi bi-person-check"></i>
+              </div>
+
+              <h3>Sign In / Sign Up</h3>
+
+              <p>
+                Sign in or create an account before checkout.
+              </p>
+
+              <a
+                href="{% url 'accounts:login' %}?next={% url 'orders:checkout' %}"
+                class="tx-btn-outline w-100 d-block text-center"
+              >
+                Sign In / Sign Up
+              </a>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

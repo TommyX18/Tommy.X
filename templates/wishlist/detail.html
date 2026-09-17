@@ -1,24 +1,893 @@
 {% extends 'base.html' %}
+
 {% block title %}Wishlist — TOMMY.X{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-  <h1 class="tx-page-title">Wishlist</h1>
-  <div class="row g-4">
-    {% for item in items %}
-    <div class="col-6 col-lg-3">
-      {% with product=item.product %}{% include 'partials/product_card.html' %}{% endwith %}
-      <form method="post" action="{% url 'wishlist:move_to_cart' item.product.id %}" class="mt-2">
-        {% csrf_token %}
-        <button type="submit" class="tx-btn-outline btn btn-sm w-100">Move to Bag</button>
-      </form>
+
+<style>
+
+/* =========================================================
+   TOMMY.X — PREMIUM WISHLIST
+   ========================================================= */
+
+.tx-wishlist-page {
+    padding: 28px 0 90px;
+}
+
+
+/* =========================================================
+   BREADCRUMB
+   ========================================================= */
+
+.tx-wishlist-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 22px;
+
+    color: #aaa;
+
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.tx-wishlist-breadcrumb a {
+    color: #777;
+    text-decoration: none;
+
+    transition: color .2s ease;
+}
+
+.tx-wishlist-breadcrumb a:hover {
+    color: #111;
+}
+
+.tx-wishlist-breadcrumb i {
+    color: #bbb;
+    font-size: 7px;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.tx-wishlist-hero {
+    position: relative;
+    overflow: hidden;
+
+    min-height: 285px;
+
+    margin-bottom: 40px;
+    padding: 45px 48px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    background:
+        linear-gradient(
+            115deg,
+            #111 0%,
+            #191919 55%,
+            #0a0a0a 100%
+        );
+
+    color: #fff;
+}
+
+.tx-wishlist-hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 440px;
+    height: 440px;
+
+    right: -150px;
+    top: -240px;
+
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 50%;
+}
+
+.tx-wishlist-hero::after {
+    content: "";
+
+    position: absolute;
+
+    width: 270px;
+    height: 270px;
+
+    right: 65px;
+    bottom: -200px;
+
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 50%;
+}
+
+.tx-wishlist-hero-content {
+    position: relative;
+    z-index: 3;
+}
+
+.tx-wishlist-kicker {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    margin: 0 0 13px;
+
+    color: #ff3b30;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+.tx-wishlist-kicker::before {
+    content: "";
+
+    width: 25px;
+    height: 1px;
+
+    background: #ff3b30;
+}
+
+.tx-wishlist-title {
+    margin: 0 0 12px;
+
+    color: #fff;
+
+    font-size: clamp(42px, 7vw, 68px);
+    font-weight: 900;
+
+    line-height: .9;
+    letter-spacing: -4px;
+}
+
+.tx-wishlist-title span {
+    color: rgba(255,255,255,.28);
+}
+
+.tx-wishlist-description {
+    max-width: 480px;
+
+    margin: 0;
+
+    color: rgba(255,255,255,.5);
+
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   COUNT
+   ========================================================= */
+
+.tx-wishlist-count {
+    position: relative;
+    z-index: 3;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: rgba(255,255,255,.45);
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+.tx-wishlist-count::before {
+    content: "";
+
+    width: 25px;
+    height: 1px;
+
+    background: rgba(255,255,255,.25);
+}
+
+
+/* =========================================================
+   COLLECTION HEADER
+   ========================================================= */
+
+.tx-wishlist-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+
+    padding-bottom: 17px;
+
+    border-bottom: 1px solid #e7e7e7;
+}
+
+.tx-wishlist-section-kicker {
+    margin: 0 0 6px;
+
+    color: #ff3b30;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+.tx-wishlist-section-title {
+    margin: 0;
+
+    color: #111;
+
+    font-size: 23px;
+    font-weight: 900;
+
+    letter-spacing: -.7px;
+}
+
+.tx-wishlist-note {
+    color: #999;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   PRODUCT GRID
+   ========================================================= */
+
+.tx-wishlist-grid {
+    row-gap: 38px;
+}
+
+.tx-wishlist-product {
+    position: relative;
+}
+
+
+/* =========================================================
+   MOVE TO BAG
+   ========================================================= */
+
+.tx-move-bag {
+    margin-top: 11px;
+}
+
+.tx-move-bag-btn {
+    width: 100%;
+    min-height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border: 1px solid #111;
+
+    background: #111;
+    color: #fff;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        background .25s ease,
+        color .25s ease,
+        transform .25s ease;
+}
+
+.tx-move-bag-btn:hover {
+    background: #fff;
+    color: #111;
+
+    transform: translateY(-2px);
+}
+
+.tx-move-bag-btn i {
+    font-size: 11px;
+
+    transition: transform .25s ease;
+}
+
+.tx-move-bag-btn:hover i {
+    transform: translateX(3px);
+}
+
+
+/* =========================================================
+   PRODUCT INDEX
+   ========================================================= */
+
+.tx-wishlist-index {
+    position: absolute;
+    z-index: 20;
+
+    right: 12px;
+    bottom: 65px;
+
+    color: rgba(255,255,255,.75);
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    mix-blend-mode: difference;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.tx-wishlist-empty {
+    position: relative;
+    overflow: hidden;
+
+    padding: 95px 25px;
+
+    border: 1px solid #e3e3e3;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fafafa,
+            #fff
+        );
+
+    text-align: center;
+}
+
+.tx-wishlist-empty::before {
+    content: "♡";
+
+    position: absolute;
+
+    right: 20px;
+    top: -70px;
+
+    color: #f0f0f0;
+
+    font-size: 190px;
+    font-weight: 900;
+
+    line-height: 1;
+}
+
+.tx-wishlist-empty-icon {
+    position: relative;
+    z-index: 2;
+
+    width: 72px;
+    height: 72px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 20px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 50%;
+
+    color: #777;
+
+    font-size: 22px;
+}
+
+.tx-wishlist-empty h2 {
+    position: relative;
+    z-index: 2;
+
+    margin: 0 0 9px;
+
+    color: #111;
+
+    font-size: 21px;
+    font-weight: 900;
+}
+
+.tx-wishlist-empty p {
+    position: relative;
+    z-index: 2;
+
+    max-width: 450px;
+
+    margin: 0 auto 24px;
+
+    color: #888;
+
+    font-size: 10px;
+
+    line-height: 1.8;
+}
+
+.tx-wishlist-empty-btn {
+    position: relative;
+    z-index: 2;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 13px 20px;
+
+    background: #111;
+    color: #fff;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    text-decoration: none;
+
+    text-transform: uppercase;
+
+    transition:
+        background .2s ease,
+        transform .2s ease;
+}
+
+.tx-wishlist-empty-btn:hover {
+    background: #ff3b30;
+    color: #fff;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   FOOTER PROMO
+   ========================================================= */
+
+.tx-wishlist-footer {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    margin-top: 65px;
+    padding: 30px 35px;
+
+    border-top: 1px solid #e4e4e4;
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.tx-wishlist-footer::after {
+    content: "X";
+
+    position: absolute;
+
+    right: 25px;
+    top: -38px;
+
+    color: #f3f3f3;
+
+    font-size: 125px;
+    font-weight: 900;
+
+    line-height: 1;
+}
+
+.tx-wishlist-footer-content {
+    position: relative;
+    z-index: 2;
+}
+
+.tx-wishlist-footer-label {
+    margin: 0 0 6px;
+
+    color: #999;
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+.tx-wishlist-footer-title {
+    margin: 0;
+
+    color: #111;
+
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.tx-wishlist-footer-link {
+    position: relative;
+    z-index: 3;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #111;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    text-decoration: none;
+
+    text-transform: uppercase;
+}
+
+.tx-wishlist-footer-link i {
+    transition: transform .25s ease;
+}
+
+.tx-wishlist-footer-link:hover i {
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .tx-wishlist-page {
+        padding: 20px 0 60px;
+    }
+
+    .tx-wishlist-hero {
+        min-height: 315px;
+
+        margin-bottom: 32px;
+
+        padding: 36px 20px;
+
+        align-items: flex-start;
+    }
+
+    .tx-wishlist-title {
+        font-size: 47px;
+        letter-spacing: -3px;
+    }
+
+    .tx-wishlist-description {
+        max-width: 90%;
+        font-size: 10px;
+    }
+
+    .tx-wishlist-count {
+        position: absolute;
+
+        left: 20px;
+        bottom: 23px;
+    }
+
+    .tx-wishlist-section-head {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 5px;
+    }
+
+    .tx-wishlist-section-title {
+        font-size: 21px;
+    }
+
+    .tx-wishlist-grid {
+        row-gap: 27px;
+    }
+
+    .tx-wishlist-index {
+        right: 8px;
+        bottom: 55px;
+    }
+
+    .tx-move-bag-btn {
+        min-height: 39px;
+        font-size: 7px;
+    }
+
+    .tx-wishlist-footer {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        margin-top: 45px;
+
+        padding: 27px 20px;
+    }
+
+}
+
+@media (max-width: 420px) {
+
+    .tx-wishlist-hero {
+        padding: 31px 17px;
+    }
+
+    .tx-wishlist-title {
+        font-size: 41px;
+    }
+
+    .tx-wishlist-count {
+        left: 17px;
+    }
+
+}
+
+</style>
+
+
+<div class="container tx-wishlist-page">
+
+
+    <!-- =====================================================
+         BREADCRUMB
+         ===================================================== -->
+
+    <div class="tx-wishlist-breadcrumb">
+
+        <a href="{% url 'core:home' %}">
+            Home
+        </a>
+
+        <i class="bi bi-chevron-right"></i>
+
+        <span>
+            Wishlist
+        </span>
+
     </div>
-    {% empty %}
-    <div class="col-12 text-center py-5">
-      <i class="bi bi-heart" style="font-size:3rem;color:var(--tx-line);"></i>
-      <p class="text-muted mt-3">Your wishlist is empty.</p>
-      <a href="{% url 'core:home' %}" class="tx-btn-primary d-inline-block mt-2">Continue Shopping</a>
-    </div>
-    {% endfor %}
-  </div>
+
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <section class="tx-wishlist-hero">
+
+        <div class="tx-wishlist-hero-content">
+
+            <p class="tx-wishlist-kicker">
+                Your Saved Styles
+            </p>
+
+            <h1 class="tx-wishlist-title">
+                Wishlist<span>.</span>
+            </h1>
+
+            <p class="tx-wishlist-description">
+                Keep the pieces you love close.
+                Your selected TOMMY.X styles are collected
+                here for whenever you're ready.
+            </p>
+
+        </div>
+
+
+        <div class="tx-wishlist-count">
+
+            {{ items|length }}
+            saved item{{ items|length|pluralize }}
+
+        </div>
+
+    </section>
+
+
+    {% if items %}
+
+
+        <!-- =================================================
+             SECTION HEADER
+             ================================================= -->
+
+        <div class="tx-wishlist-section-head">
+
+            <div>
+
+                <p class="tx-wishlist-section-kicker">
+                    Curated For You
+                </p>
+
+                <h2 class="tx-wishlist-section-title">
+                    Your Collection
+                </h2>
+
+            </div>
+
+
+            <div class="tx-wishlist-note">
+
+                {{ items|length }}
+                saved style{{ items|length|pluralize }}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PRODUCTS
+             ================================================= -->
+
+        <div class="row g-3 g-md-4 tx-wishlist-grid">
+
+
+            {% for item in items %}
+
+            <div class="col-6 col-lg-3 tx-wishlist-product">
+
+
+                {% with product=item.product %}
+
+
+                    <!-- PRODUCT CARD -->
+
+                    {% include 'partials/product_card.html' %}
+
+
+                    <!-- PRODUCT INDEX -->
+
+                    <span class="tx-wishlist-index">
+
+                        {{ forloop.counter|stringformat:"02d" }}
+
+                    </span>
+
+
+                    <!-- MOVE TO BAG -->
+
+                    <form
+                        method="post"
+                        action="{% url 'wishlist:move_to_cart' item.product.id %}"
+                        class="tx-move-bag"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="tx-move-bag-btn"
+                        >
+
+                            <i class="bi bi-bag-plus"></i>
+
+                            Move to Bag
+
+                            <i class="bi bi-arrow-right"></i>
+
+                        </button>
+
+                    </form>
+
+
+                {% endwith %}
+
+
+            </div>
+
+            {% endfor %}
+
+
+        </div>
+
+
+        <!-- =================================================
+             BOTTOM PROMO
+             ================================================= -->
+
+        <section class="tx-wishlist-footer">
+
+            <div class="tx-wishlist-footer-content">
+
+                <p class="tx-wishlist-footer-label">
+                    TOMMY.X
+                </p>
+
+                <h3 class="tx-wishlist-footer-title">
+                    Still looking for something?
+                </h3>
+
+            </div>
+
+
+            <a
+                href="{% url 'core:home' %}"
+                class="tx-wishlist-footer-link"
+            >
+
+                Explore Collection
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </section>
+
+
+    {% else %}
+
+
+        <!-- =================================================
+             EMPTY WISHLIST
+             ================================================= -->
+
+        <section class="tx-wishlist-empty">
+
+            <div class="tx-wishlist-empty-icon">
+
+                <i class="bi bi-heart"></i>
+
+            </div>
+
+
+            <h2>
+                Your wishlist is waiting
+            </h2>
+
+
+            <p>
+                Save the styles you love and they'll appear
+                here whenever you're ready to make them yours.
+            </p>
+
+
+            <a
+                href="{% url 'core:home' %}"
+                class="tx-wishlist-empty-btn"
+            >
+
+                Discover Styles
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </section>
+
+
+    {% endif %}
+
+
 </div>
+
 {% endblock %}

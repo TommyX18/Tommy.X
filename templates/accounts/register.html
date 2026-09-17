@@ -1,24 +1,1175 @@
 {% extends 'base.html' %}
-{% block title %}Register — TOMMY.X{% endblock %}
+{% load static %}
+
+{% block title %}Create Account — TOMMY.X{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-5">
-      <h1 class="tx-page-title text-center">Create Account</h1>
-      <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-        <div class="mb-3">
-          <label class="form-label">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
-          {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+
+<style>
+
+/* =========================================================
+   REGISTER PAGE
+   ========================================================= */
+
+.tx-register-page {
+
+    min-height: calc(100vh - 70px);
+
+    position: relative;
+
+    overflow: hidden;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    padding: 60px 7%;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(5,5,5,.18) 0%,
+            rgba(5,5,5,.42) 42%,
+            rgba(5,5,5,.94) 100%
+        ),
+        url("{% static 'img/login-backdrop.jpg' %}");
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-repeat: no-repeat;
+}
+
+
+/* =========================================================
+   OVERLAY
+   ========================================================= */
+
+.tx-register-page::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle at 20% 50%,
+            rgba(255,59,48,.10),
+            transparent 35%
+        ),
+        linear-gradient(
+            180deg,
+            rgba(0,0,0,.05),
+            rgba(0,0,0,.45)
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   LEFT BRAND
+   ========================================================= */
+
+.tx-register-brand {
+
+    position: absolute;
+
+    left: 7%;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    z-index: 2;
+
+    max-width: 540px;
+}
+
+
+.tx-register-brand-small {
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    letter-spacing: 5px;
+
+    text-transform: uppercase;
+
+    color: rgba(255,255,255,.78);
+
+    margin-bottom: 22px;
+}
+
+
+.tx-register-brand h2 {
+
+    margin: 0;
+
+    font-size: clamp(55px, 7vw, 100px);
+
+    line-height: .86;
+
+    font-weight: 900;
+
+    letter-spacing: -5px;
+
+    color: #fff;
+}
+
+
+.tx-register-brand h2 span {
+
+    display: block;
+
+    color: var(
+        --tx-orange,
+        #ff3b30
+    );
+}
+
+
+.tx-register-brand p {
+
+    margin-top: 30px;
+
+    max-width: 430px;
+
+    color: rgba(255,255,255,.70);
+
+    font-size: 15px;
+
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.tx-register-card {
+
+    position: relative;
+
+    z-index: 3;
+
+    width: 100%;
+
+    max-width: 470px;
+
+    padding: 40px;
+
+    border: 1px solid rgba(255,255,255,.16);
+
+    border-radius: 4px;
+
+    background: rgba(12,12,12,.82);
+
+    backdrop-filter: blur(20px);
+
+    -webkit-backdrop-filter: blur(20px);
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.60),
+        inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+
+.tx-register-logo {
+
+    font-size: 25px;
+
+    font-weight: 900;
+
+    letter-spacing: 4px;
+
+    color: #fff;
+
+    margin-bottom: 30px;
+}
+
+
+.tx-register-logo span {
+
+    color: var(
+        --tx-orange,
+        #ff3b30
+    );
+}
+
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.tx-register-title {
+
+    margin: 0 0 8px;
+
+    font-size: 31px;
+
+    font-weight: 800;
+
+    color: #fff;
+}
+
+
+.tx-register-subtitle {
+
+    color: rgba(255,255,255,.52);
+
+    font-size: 13px;
+
+    margin-bottom: 28px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   FIELD
+   ========================================================= */
+
+.tx-register-field {
+
+    margin-bottom: 18px;
+}
+
+
+.tx-register-label {
+
+    display: block;
+
+    color: rgba(255,255,255,.75);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 8px;
+}
+
+
+.tx-register-input {
+
+    width: 100%;
+
+    height: 50px;
+
+    padding: 0 15px;
+
+    border: 1px solid rgba(255,255,255,.14);
+
+    border-radius: 2px;
+
+    background: rgba(0,0,0,.48);
+
+    color: #fff;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition: .25s ease;
+}
+
+
+.tx-register-input::placeholder {
+
+    color: rgba(255,255,255,.28);
+}
+
+
+.tx-register-input:focus {
+
+    border-color: var(
+        --tx-orange,
+        #ff3b30
+    );
+
+    background: rgba(0,0,0,.65);
+
+    box-shadow:
+        0 0 0 3px rgba(255,59,48,.08);
+}
+
+
+/* =========================================================
+   PHONE
+   ========================================================= */
+
+.tx-register-phone {
+
+    display: flex;
+
+    width: 100%;
+}
+
+
+.tx-register-country {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 58px;
+
+    height: 50px;
+
+    flex-shrink: 0;
+
+    border: 1px solid rgba(255,255,255,.14);
+
+    border-right: 0;
+
+    border-radius: 2px 0 0 2px;
+
+    background: rgba(255,255,255,.06);
+
+    color: rgba(255,255,255,.78);
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+.tx-register-phone input {
+
+    border-radius: 0 2px 2px 0;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   FIELD ERROR
+   ========================================================= */
+
+.tx-register-error {
+
+    margin-top: 7px;
+
+    color: #ff8b8b;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   HELP TEXT
+   ========================================================= */
+
+.tx-register-help {
+
+    margin-top: 7px;
+
+    color: rgba(255,255,255,.34);
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   PASSWORD
+   ========================================================= */
+
+.tx-register-password {
+
+    position: relative;
+}
+
+
+.tx-register-password input {
+
+    padding-right: 65px;
+}
+
+
+.tx-register-password button {
+
+    position: absolute;
+
+    right: 12px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: 0;
+
+    background: transparent;
+
+    color: rgba(255,255,255,.45);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+}
+
+
+.tx-register-password button:hover {
+
+    color: var(
+        --tx-orange,
+        #ff3b30
+    );
+}
+
+
+/* =========================================================
+   SUBMIT
+   ========================================================= */
+
+.tx-register-submit {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    height: 54px;
+
+    margin-top: 8px;
+
+    border: 0;
+
+    border-radius: 2px;
+
+    background: var(
+        --tx-orange,
+        #ff3b30
+    );
+
+    color: #fff;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.8px;
+
+    cursor: pointer;
+
+    transition: .25s ease;
+}
+
+
+.tx-register-submit:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 30px rgba(255,59,48,.25);
+}
+
+
+.tx-register-submit i {
+
+    transition: transform .25s ease;
+}
+
+
+.tx-register-submit:hover i {
+
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   LOGIN LINK
+   ========================================================= */
+
+.tx-register-login {
+
+    text-align: center;
+
+    margin-top: 25px;
+
+    color: rgba(255,255,255,.40);
+
+    font-size: 12px;
+}
+
+
+.tx-register-login a {
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-weight: 700;
+}
+
+
+.tx-register-login a:hover {
+
+    color: var(
+        --tx-orange,
+        #ff3b30
+    );
+}
+
+
+/* =========================================================
+   BACK
+   ========================================================= */
+
+.tx-register-back {
+
+    display: block;
+
+    text-align: center;
+
+    margin-top: 18px;
+
+    color: rgba(255,255,255,.32);
+
+    font-size: 10px;
+
+    text-decoration: none;
+
+    letter-spacing: .5px;
+}
+
+
+.tx-register-back:hover {
+
+    color: #fff;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .tx-register-page {
+
+        justify-content: center;
+
+        padding: 40px 20px;
+
+        background-position: 38% center;
+    }
+
+
+    .tx-register-brand {
+
+        display: none;
+    }
+
+
+    .tx-register-card {
+
+        max-width: 470px;
+
+        padding: 35px 28px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .tx-register-page {
+
+        min-height: calc(100vh - 60px);
+
+        padding: 25px 15px;
+    }
+
+
+    .tx-register-card {
+
+        padding: 30px 22px;
+    }
+
+
+    .tx-register-title {
+
+        font-size: 27px;
+    }
+
+
+    .tx-register-logo {
+
+        margin-bottom: 25px;
+    }
+}
+
+</style>
+
+
+<!-- =========================================================
+     REGISTER PAGE
+     ========================================================= -->
+
+<div class="tx-register-page">
+
+
+    <!-- =====================================================
+         LEFT BRAND
+         ===================================================== -->
+
+    <div class="tx-register-brand">
+
+        <div class="tx-register-brand-small">
+            TOMMY.X MEN'S WEAR
         </div>
-        {% endfor %}
-        <button type="submit" class="tx-btn-primary w-100">Register</button>
-      </form>
-      <p class="text-center text-muted mt-3">Already have an account? <a href="{% url 'accounts:login' %}" style="color:var(--tx-orange);">Login</a></p>
+
+
+        <h2>
+            JOIN
+            <span>THE STYLE.</span>
+        </h2>
+
+
+        <p>
+            Create your TOMMY.X account and discover
+            premium fits, timeless silhouettes and
+            collections designed for modern men.
+        </p>
+
     </div>
-  </div>
+
+
+    <!-- =====================================================
+         REGISTER CARD
+         ===================================================== -->
+
+    <div class="tx-register-card">
+
+
+        <!-- LOGO -->
+
+        <div class="tx-register-logo">
+            TOMMY<span>.</span>X
+        </div>
+
+
+        <!-- TITLE -->
+
+        <h1 class="tx-register-title">
+            Create your account.
+        </h1>
+
+
+        <p class="tx-register-subtitle">
+            Join TOMMY.X and make every outfit count.
+        </p>
+
+
+        <!-- =================================================
+             FORM
+             ================================================= -->
+
+        <form
+            method="post"
+            id="txRegisterForm"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- =============================================
+                 PRESERVE NEXT
+                 ============================================= -->
+
+            {% if request.GET.next %}
+
+                <input
+                    type="hidden"
+                    name="next"
+                    value="{{ request.GET.next }}"
+                >
+
+            {% endif %}
+
+
+            {% if form.non_field_errors %}
+
+                <div class="tx-register-error"
+                     style="margin-bottom:18px;">
+
+                    {% for error in form.non_field_errors %}
+
+                        {{ error }}
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- =============================================
+                 USERNAME
+                 ============================================= -->
+
+            <div class="tx-register-field">
+
+                <label
+                    class="tx-register-label"
+                    for="{{ form.username.id_for_label }}"
+                >
+                    Username
+                </label>
+
+
+                {{ form.username.as_widget.attrs }}
+
+
+                <input
+                    type="text"
+                    name="{{ form.username.html_name }}"
+                    id="{{ form.username.id_for_label }}"
+                    class="tx-register-input"
+                    placeholder="Choose a username"
+                    autocomplete="username"
+                    value="{{ form.username.value|default:'' }}"
+                    required
+                >
+
+
+                {% for error in form.username.errors %}
+
+                    <div class="tx-register-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =============================================
+                 PHONE
+                 ============================================= -->
+
+            <div class="tx-register-field">
+
+                <label
+                    class="tx-register-label"
+                    for="{{ form.phone.id_for_label }}"
+                >
+                    Phone Number
+                </label>
+
+
+                <div class="tx-register-phone">
+
+                    <div class="tx-register-country">
+                        +91
+                    </div>
+
+
+                    <input
+                        type="tel"
+                        name="{{ form.phone.html_name }}"
+                        id="{{ form.phone.id_for_label }}"
+                        class="tx-register-input"
+                        placeholder="Enter 10-digit mobile number"
+                        maxlength="10"
+                        inputmode="numeric"
+                        autocomplete="tel"
+                        value="{{ form.phone.value|default:'' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="tx-register-help">
+
+                    <i class="bi bi-shield-check"></i>
+
+                    Your registered phone number can be used
+                    for your TOMMY.X account.
+
+                </div>
+
+
+                {% for error in form.phone.errors %}
+
+                    <div class="tx-register-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =============================================
+                 EMAIL
+                 ============================================= -->
+
+            <div class="tx-register-field">
+
+                <label
+                    class="tx-register-label"
+                    for="{{ form.email.id_for_label }}"
+                >
+                    Email Address
+                </label>
+
+
+                <input
+                    type="email"
+                    name="{{ form.email.html_name }}"
+                    id="{{ form.email.id_for_label }}"
+                    class="tx-register-input"
+                    placeholder="Enter your email address"
+                    autocomplete="email"
+                    value="{{ form.email.value|default:'' }}"
+                    required
+                >
+
+
+                {% for error in form.email.errors %}
+
+                    <div class="tx-register-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =============================================
+                 PASSWORD
+                 ============================================= -->
+
+            <div class="tx-register-field">
+
+                <label
+                    class="tx-register-label"
+                    for="{{ form.password1.id_for_label }}"
+                >
+                    Password
+                </label>
+
+
+                <div class="tx-register-password">
+
+                    <input
+                        type="password"
+                        name="{{ form.password1.html_name }}"
+                        id="{{ form.password1.id_for_label }}"
+                        class="tx-register-input"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+
+                    <button
+                        type="button"
+                        data-password="password1"
+                    >
+                        SHOW
+                    </button>
+
+                </div>
+
+
+                {% if form.password1.help_text %}
+
+                    <div class="tx-register-help">
+                        {{ form.password1.help_text|safe }}
+                    </div>
+
+                {% endif %}
+
+
+                {% for error in form.password1.errors %}
+
+                    <div class="tx-register-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =============================================
+                 CONFIRM PASSWORD
+                 ============================================= -->
+
+            <div class="tx-register-field">
+
+                <label
+                    class="tx-register-label"
+                    for="{{ form.password2.id_for_label }}"
+                >
+                    Confirm Password
+                </label>
+
+
+                <div class="tx-register-password">
+
+                    <input
+                        type="password"
+                        name="{{ form.password2.html_name }}"
+                        id="{{ form.password2.id_for_label }}"
+                        class="tx-register-input"
+                        placeholder="Confirm your password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+
+                    <button
+                        type="button"
+                        data-password="password2"
+                    >
+                        SHOW
+                    </button>
+
+                </div>
+
+
+                {% for error in form.password2.errors %}
+
+                    <div class="tx-register-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =============================================
+                 SUBMIT
+                 ============================================= -->
+
+            <button
+                type="submit"
+                class="tx-register-submit"
+                id="txRegisterSubmit"
+            >
+
+                <span>
+                    CREATE ACCOUNT
+                </span>
+
+                <i class="bi bi-arrow-right"></i>
+
+            </button>
+
+
+        </form>
+
+
+        <!-- =================================================
+             LOGIN
+             ================================================= -->
+
+        <div class="tx-register-login">
+
+            Already have an account?
+
+            <a
+                href="{% url 'accounts:login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
+            >
+                Sign in
+            </a>
+
+        </div>
+
+
+        <!-- =================================================
+             BACK
+             ================================================= -->
+
+        <a
+            href="{% url 'core:home' %}"
+            class="tx-register-back"
+        >
+            ← Back to TOMMY.X
+        </a>
+
+
+    </div>
+
 </div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        "use strict";
+
+
+        /* =====================================================
+           PHONE INPUT
+           ===================================================== */
+
+        const phoneInput =
+            document.getElementById(
+                "{{ form.phone.id_for_label }}"
+            );
+
+
+        if (phoneInput) {
+
+            phoneInput.addEventListener(
+                "input",
+                function () {
+
+                    this.value =
+                        this.value
+                            .replace(/\D/g, "")
+                            .slice(0, 10);
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           PASSWORD SHOW / HIDE
+           ===================================================== */
+
+        document
+            .querySelectorAll(
+                "[data-password]"
+            )
+            .forEach(
+                function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const fieldName =
+                                this.dataset.password;
+
+                            const input =
+                                document.getElementById(
+                                    "id_" + fieldName
+                                );
+
+
+                            if (!input) {
+                                return;
+                            }
+
+
+                            if (
+                                input.type === "password"
+                            ) {
+
+                                input.type = "text";
+
+                                this.textContent =
+                                    "HIDE";
+
+                            } else {
+
+                                input.type = "password";
+
+                                this.textContent =
+                                    "SHOW";
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =====================================================
+           FORM SUBMIT LOADING
+           ===================================================== */
+
+        const form =
+            document.getElementById(
+                "txRegisterForm"
+            );
+
+        const submitButton =
+            document.getElementById(
+                "txRegisterSubmit"
+            );
+
+
+        if (form && submitButton) {
+
+            form.addEventListener(
+                "submit",
+                function () {
+
+                    /*
+                     * Let Django validation happen normally.
+                     * The button is changed only after the browser
+                     * has passed its basic required-field validation.
+                     */
+
+                    setTimeout(
+                        function () {
+
+                            submitButton.disabled = true;
+
+                            submitButton.innerHTML =
+                                '<span>CREATING ACCOUNT...</span>' +
+                                '<i class="bi bi-arrow-repeat"></i>';
+
+                        },
+                        0
+                    );
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
 {% endblock %}

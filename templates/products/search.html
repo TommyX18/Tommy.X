@@ -1,26 +1,1075 @@
 {% extends 'base.html' %}
+
 {% block title %}Search — TOMMY.X{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-  <h1 class="tx-page-title">Search</h1>
-  <form method="get" class="mb-4" style="max-width:520px;">
-    <div class="input-group">
-      <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-      <input type="text" name="q" id="txSearchInput" value="{{ query }}" class="form-control form-control-lg" placeholder="Search shirts, pants, t-shirts…" autofocus>
-      <button class="tx-btn-primary" type="submit">Search</button>
+
+<style>
+
+/* =========================================================
+   TOMMY.X — PREMIUM SEARCH PAGE
+   ========================================================= */
+
+.tx-search-page {
+    padding: 28px 0 90px;
+}
+
+
+/* =========================================================
+   BREADCRUMB
+   ========================================================= */
+
+.tx-search-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 22px;
+
+    color: #aaa;
+
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.tx-search-breadcrumb a {
+    color: #777;
+    text-decoration: none;
+    transition: color .2s ease;
+}
+
+.tx-search-breadcrumb a:hover {
+    color: #111;
+}
+
+.tx-search-breadcrumb i {
+    color: #bbb;
+    font-size: 7px;
+}
+
+
+/* =========================================================
+   SEARCH HERO
+   ========================================================= */
+
+.tx-search-hero {
+    position: relative;
+    overflow: hidden;
+
+    min-height: 330px;
+
+    margin-bottom: 40px;
+    padding: 52px 50px;
+
+    display: flex;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            115deg,
+            #111 0%,
+            #181818 52%,
+            #0a0a0a 100%
+        );
+
+    color: #fff;
+}
+
+
+/* decorative rings */
+
+.tx-search-hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 460px;
+    height: 460px;
+
+    right: -150px;
+    top: -230px;
+
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 50%;
+}
+
+.tx-search-hero::after {
+    content: "";
+
+    position: absolute;
+
+    width: 280px;
+    height: 280px;
+
+    right: 70px;
+    bottom: -210px;
+
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 50%;
+}
+
+
+.tx-search-content {
+    position: relative;
+    z-index: 3;
+
+    width: 100%;
+    max-width: 850px;
+}
+
+
+.tx-search-kicker {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    margin: 0 0 14px;
+
+    color: #ff3b30;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+.tx-search-kicker::before {
+    content: "";
+
+    width: 25px;
+    height: 1px;
+
+    background: #ff3b30;
+}
+
+
+.tx-search-title {
+    margin: 0 0 12px;
+
+    color: #fff;
+
+    font-size: clamp(42px, 7vw, 70px);
+    font-weight: 900;
+
+    line-height: .9;
+    letter-spacing: -4px;
+}
+
+.tx-search-title span {
+    color: rgba(255,255,255,.28);
+}
+
+
+.tx-search-description {
+    margin: 0 0 25px;
+
+    color: rgba(255,255,255,.48);
+
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   SEARCH FORM
+   ========================================================= */
+
+.tx-search-form {
+    width: 100%;
+    max-width: 720px;
+}
+
+
+.tx-search-box {
+    display: flex;
+    align-items: stretch;
+
+    width: 100%;
+
+    background: #fff;
+
+    box-shadow:
+        0 20px 55px rgba(0,0,0,.24);
+}
+
+
+.tx-search-icon {
+    width: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #777;
+
+    font-size: 15px;
+}
+
+
+.tx-search-input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 58px;
+
+    padding: 0 10px;
+
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+    color: #111;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.tx-search-input::placeholder {
+    color: #aaa;
+}
+
+
+.tx-search-submit {
+    min-width: 125px;
+
+    border: 0;
+
+    background: #111;
+    color: #fff;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 1.4px;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        background .25s ease,
+        color .25s ease;
+}
+
+
+.tx-search-submit:hover {
+    background: #ff3b30;
+    color: #fff;
+}
+
+
+/* =========================================================
+   SEARCH DECORATIVE SIDE LABEL
+   ========================================================= */
+
+.tx-search-side-label {
+    position: absolute;
+    z-index: 3;
+
+    right: 42px;
+    bottom: 35px;
+
+    writing-mode: vertical-rl;
+
+    color: rgba(255,255,255,.22);
+
+    font-size: 7px;
+    font-weight: 800;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   QUICK SEARCH TERMS
+   ========================================================= */
+
+.tx-search-suggestions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 15px;
+}
+
+
+.tx-search-suggestion-label {
+    color: rgba(255,255,255,.32);
+
+    font-size: 7px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-search-suggestion {
+    padding: 6px 9px;
+
+    border: 1px solid rgba(255,255,255,.12);
+
+    color: rgba(255,255,255,.5);
+
+    font-size: 7px;
+    font-weight: 700;
+
+    letter-spacing: .5px;
+
+    text-decoration: none;
+    text-transform: uppercase;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease;
+}
+
+
+.tx-search-suggestion:hover {
+    border-color: rgba(255,255,255,.35);
+
+    background: rgba(255,255,255,.08);
+
+    color: #fff;
+}
+
+
+/* =========================================================
+   RESULT HEADER
+   ========================================================= */
+
+.tx-search-results-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+
+    padding-bottom: 17px;
+
+    border-bottom: 1px solid #e7e7e7;
+}
+
+
+.tx-search-results-kicker {
+    margin: 0 0 6px;
+
+    color: #ff3b30;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-search-results-title {
+    margin: 0;
+
+    color: #111;
+
+    font-size: 23px;
+    font-weight: 900;
+
+    letter-spacing: -.7px;
+}
+
+
+.tx-search-results-title span {
+    color: #999;
+    font-weight: 600;
+}
+
+
+.tx-search-result-count {
+    color: #999;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   PRODUCT GRID
+   ========================================================= */
+
+.tx-search-grid {
+    row-gap: 38px;
+}
+
+
+.tx-search-product {
+    position: relative;
+}
+
+
+/* product number */
+
+.tx-search-product-number {
+    position: absolute;
+    z-index: 20;
+
+    right: 12px;
+    bottom: 12px;
+
+    color: rgba(255,255,255,.72);
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    mix-blend-mode: difference;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   EMPTY SEARCH
+   ========================================================= */
+
+.tx-search-empty {
+    position: relative;
+    overflow: hidden;
+
+    padding: 90px 25px;
+
+    border: 1px solid #e3e3e3;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fafafa,
+            #fff
+        );
+
+    text-align: center;
+}
+
+
+.tx-search-empty::before {
+    content: "X";
+
+    position: absolute;
+
+    right: 25px;
+    top: -45px;
+
+    color: #f1f1f1;
+
+    font-size: 150px;
+    font-weight: 900;
+
+    line-height: 1;
+}
+
+
+.tx-search-empty-icon {
+    position: relative;
+    z-index: 2;
+
+    width: 70px;
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 20px;
+
+    border: 1px solid #ddd;
+    border-radius: 50%;
+
+    color: #777;
+
+    font-size: 21px;
+}
+
+
+.tx-search-empty h2 {
+    position: relative;
+    z-index: 2;
+
+    margin: 0 0 9px;
+
+    color: #111;
+
+    font-size: 20px;
+    font-weight: 900;
+}
+
+
+.tx-search-empty p {
+    position: relative;
+    z-index: 2;
+
+    max-width: 450px;
+
+    margin: 0 auto 24px;
+
+    color: #888;
+
+    font-size: 10px;
+
+    line-height: 1.8;
+}
+
+
+.tx-search-empty-btn {
+    position: relative;
+    z-index: 2;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 12px 18px;
+
+    background: #111;
+    color: #fff;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    text-decoration: none;
+
+    text-transform: uppercase;
+
+    transition:
+        background .2s ease,
+        transform .2s ease;
+}
+
+
+.tx-search-empty-btn:hover {
+    background: #ff3b30;
+
+    color: #fff;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   SEARCH WITHOUT QUERY
+   ========================================================= */
+
+.tx-search-start {
+    padding: 75px 25px;
+
+    border: 1px solid #e5e5e5;
+
+    background: #fafafa;
+
+    text-align: center;
+}
+
+
+.tx-search-start-icon {
+    width: 62px;
+    height: 62px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 18px;
+
+    border: 1px solid #ddd;
+    border-radius: 50%;
+
+    color: #777;
+
+    font-size: 20px;
+}
+
+
+.tx-search-start h2 {
+    margin: 0 0 8px;
+
+    color: #111;
+
+    font-size: 19px;
+    font-weight: 900;
+}
+
+
+.tx-search-start p {
+    margin: 0;
+
+    color: #888;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .tx-search-page {
+        padding: 20px 0 60px;
+    }
+
+
+    .tx-search-hero {
+        min-height: 360px;
+
+        padding: 35px 20px;
+
+        margin-bottom: 32px;
+
+        align-items: flex-start;
+    }
+
+
+    .tx-search-title {
+        font-size: 47px;
+
+        letter-spacing: -3px;
+    }
+
+
+    .tx-search-description {
+        max-width: 90%;
+
+        font-size: 10px;
+    }
+
+
+    .tx-search-box {
+        display: grid;
+
+        grid-template-columns: 42px 1fr;
+    }
+
+
+    .tx-search-icon {
+        width: 42px;
+    }
+
+
+    .tx-search-input {
+        height: 50px;
+
+        font-size: 11px;
+    }
+
+
+    .tx-search-submit {
+        grid-column: 1 / -1;
+
+        width: 100%;
+
+        min-height: 43px;
+    }
+
+
+    .tx-search-side-label {
+        right: 18px;
+        bottom: 23px;
+    }
+
+
+    .tx-search-suggestions {
+        margin-top: 12px;
+    }
+
+
+    .tx-search-results-head {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 5px;
+
+        margin-bottom: 18px;
+    }
+
+
+    .tx-search-results-title {
+        font-size: 21px;
+    }
+
+
+    .tx-search-grid {
+        row-gap: 28px;
+    }
+
+
+    .tx-search-product-number {
+        right: 8px;
+        bottom: 8px;
+    }
+
+
+    .tx-search-empty {
+        padding: 70px 20px;
+    }
+
+}
+
+
+@media (max-width: 420px) {
+
+    .tx-search-hero {
+        padding: 30px 17px;
+    }
+
+
+    .tx-search-title {
+        font-size: 41px;
+    }
+
+
+    .tx-search-description {
+        font-size: 9px;
+    }
+
+
+    .tx-search-suggestion-label {
+        width: 100%;
+    }
+
+
+    .tx-search-results-title {
+        font-size: 20px;
+    }
+
+}
+
+</style>
+
+
+<div class="container tx-search-page">
+
+
+    <!-- =====================================================
+         BREADCRUMB
+         ===================================================== -->
+
+    <div class="tx-search-breadcrumb">
+
+        <a href="{% url 'core:home' %}">
+            Home
+        </a>
+
+        <i class="bi bi-chevron-right"></i>
+
+        <span>
+            Search
+        </span>
+
     </div>
-  </form>
 
-  {% if query %}
-    <p class="text-muted">{{ products|length }} result{{ products|length|pluralize }} for "{{ query }}"</p>
-  {% endif %}
 
-  <div class="row g-4" id="txSearchLive">
-    {% for product in products %}
-    <div class="col-6 col-lg-3" data-name="{{ product.name }}">{% include 'partials/product_card.html' %}</div>
-    {% empty %}
-    {% if query %}<p class="text-muted py-4">No products matched your search. Try a different keyword.</p>{% endif %}
-    {% endfor %}
-  </div>
+    <!-- =====================================================
+         SEARCH HERO
+         ===================================================== -->
+
+    <section class="tx-search-hero">
+
+        <div class="tx-search-content">
+
+
+            <p class="tx-search-kicker">
+                Find Your Style
+            </p>
+
+
+            <h1 class="tx-search-title">
+                Search<span>.</span>
+            </h1>
+
+
+            <p class="tx-search-description">
+                Search the TOMMY.X collection and discover
+                shirts, t-shirts, pants, footwear and more.
+            </p>
+
+
+            <!-- SEARCH FORM -->
+
+            <form
+                method="get"
+                class="tx-search-form"
+            >
+
+                <div class="tx-search-box">
+
+
+                    <div class="tx-search-icon">
+
+                        <i class="bi bi-search"></i>
+
+                    </div>
+
+
+                    <input
+                        type="text"
+                        name="q"
+                        id="txSearchInput"
+                        value="{{ query }}"
+                        class="tx-search-input"
+                        placeholder="Search shirts, pants, t-shirts..."
+                        autocomplete="off"
+                        autofocus
+                    >
+
+
+                    <button
+                        type="submit"
+                        class="tx-search-submit"
+                    >
+
+                        Search Collection
+
+                    </button>
+
+
+                </div>
+
+
+                <!-- SEARCH SUGGESTIONS -->
+
+                <div class="tx-search-suggestions">
+
+                    <span class="tx-search-suggestion-label">
+                        Try
+                    </span>
+
+
+                    <a
+                        href="?q=shirts"
+                        class="tx-search-suggestion"
+                    >
+                        Shirts
+                    </a>
+
+
+                    <a
+                        href="?q=t-shirts"
+                        class="tx-search-suggestion"
+                    >
+                        T-Shirts
+                    </a>
+
+
+                    <a
+                        href="?q=pants"
+                        class="tx-search-suggestion"
+                    >
+                        Pants
+                    </a>
+
+
+                    <a
+                        href="?q=footwear"
+                        class="tx-search-suggestion"
+                    >
+                        Footwear
+                    </a>
+
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+        <div class="tx-search-side-label">
+            TOMMY.X / DISCOVER
+        </div>
+
+
+    </section>
+
+
+    <!-- =====================================================
+         SEARCH RESULTS
+         ===================================================== -->
+
+    {% if query %}
+
+
+        <div class="tx-search-results-head">
+
+
+            <div>
+
+                <p class="tx-search-results-kicker">
+                    Search Results
+                </p>
+
+
+                <h2 class="tx-search-results-title">
+
+                    Results for
+                    <span>"{{ query }}"</span>
+
+                </h2>
+
+            </div>
+
+
+            <div class="tx-search-result-count">
+
+                {{ products|length }}
+                result{{ products|length|pluralize }}
+
+            </div>
+
+
+        </div>
+
+
+        {% if products %}
+
+
+            <!-- PRODUCT GRID -->
+
+            <div
+                class="row g-3 g-md-4 tx-search-grid"
+                id="txSearchLive"
+            >
+
+
+                {% for product in products %}
+
+                <div
+                    class="col-6 col-lg-3 tx-search-product"
+                    data-name="{{ product.name }}"
+                >
+
+
+                    {% include 'partials/product_card.html' %}
+
+
+                    <span class="tx-search-product-number">
+
+                        {{ forloop.counter|stringformat:"02d" }}
+
+                    </span>
+
+
+                </div>
+
+                {% endfor %}
+
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- =================================================
+                 NO RESULTS
+                 ================================================= -->
+
+            <section class="tx-search-empty">
+
+
+                <div class="tx-search-empty-icon">
+
+                    <i class="bi bi-search"></i>
+
+                </div>
+
+
+                <h2>
+                    No matching styles found
+                </h2>
+
+
+                <p>
+                    We couldn't find anything for
+                    "{{ query }}". Try a different keyword,
+                    category or product name.
+                </p>
+
+
+                <a
+                    href="{% url 'products:search' %}"
+                    class="tx-search-empty-btn"
+                >
+
+                    Clear Search
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </a>
+
+
+            </section>
+
+
+        {% endif %}
+
+
+    {% else %}
+
+
+        <!-- =================================================
+             INITIAL SEARCH STATE
+             ================================================= -->
+
+        <section class="tx-search-start">
+
+
+            <div class="tx-search-start-icon">
+
+                <i class="bi bi-compass"></i>
+
+            </div>
+
+
+            <h2>
+                Discover your next style
+            </h2>
+
+
+            <p>
+                Start searching to explore the TOMMY.X collection.
+            </p>
+
+
+        </section>
+
+
+    {% endif %}
+
+
 </div>
+
+
 {% endblock %}

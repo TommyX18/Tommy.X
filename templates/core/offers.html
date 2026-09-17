@@ -1,14 +1,565 @@
 {% extends 'base.html' %}
+
 {% block title %}Offers — TOMMY.X{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-  <h1 class="tx-page-title">Offers</h1>
-  <div class="row g-4">
-    {% for product in products %}
-    <div class="col-6 col-lg-3">{% include 'partials/product_card.html' %}</div>
-    {% empty %}
-    <p class="text-muted py-4">No active offers right now — check back soon.</p>
-    {% endfor %}
-  </div>
+
+<style>
+
+/* =========================================================
+   TOMMY.X — OFFERS PAGE
+   ========================================================= */
+
+.tx-offers-page {
+    padding: 35px 0 80px;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.tx-offers-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+    margin-bottom: 42px;
+    padding: 55px 50px;
+    display: flex;
+    align-items: center;
+    background:
+        linear-gradient(
+            115deg,
+            #111 0%,
+            #181818 55%,
+            #0b0b0b 100%
+        );
+    color: #fff;
+}
+
+.tx-offers-hero::before {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    right: -140px;
+    top: -210px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 50%;
+}
+
+.tx-offers-hero::after {
+    content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    right: 70px;
+    bottom: -190px;
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 50%;
+}
+
+.tx-offers-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 650px;
+}
+
+.tx-offers-kicker {
+    margin: 0 0 12px;
+    color: #ff3b30;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.tx-offers-title {
+    margin: 0 0 14px;
+    color: #fff;
+    font-size: clamp(38px, 6vw, 65px);
+    line-height: .95;
+    font-weight: 900;
+    letter-spacing: -3px;
+}
+
+.tx-offers-title span {
+    color: rgba(255,255,255,.35);
+}
+
+.tx-offers-description {
+    max-width: 520px;
+    margin: 0;
+    color: rgba(255,255,255,.58);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.tx-offers-count {
+    position: absolute;
+    z-index: 2;
+    right: 45px;
+    bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: rgba(255,255,255,.45);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.tx-offers-count::before {
+    content: "";
+    width: 25px;
+    height: 1px;
+    background: rgba(255,255,255,.25);
+}
+
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+
+.tx-offers-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.tx-offers-section-kicker {
+    margin: 0 0 6px;
+    color: #ff3b30;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.tx-offers-section-title {
+    margin: 0;
+    color: #111;
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: -.8px;
+}
+
+.tx-offers-section-note {
+    margin: 0;
+    color: #999;
+    font-size: 10px;
+}
+
+/* =========================================================
+   PRODUCT GRID
+   ========================================================= */
+
+.tx-offers-grid {
+    row-gap: 35px;
+}
+
+/* =========================================================
+   PRODUCT WRAPPER
+   ========================================================= */
+
+.tx-offer-product {
+    position: relative;
+}
+
+/* =========================================================
+   OFFER BADGE
+   ========================================================= */
+
+.tx-offer-badge {
+    position: absolute;
+    z-index: 10;
+    top: 12px;
+    left: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 10px;
+    background: #111;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    pointer-events: none;
+}
+
+.tx-offer-badge i {
+    color: #ff3b30;
+    font-size: 9px;
+}
+
+/* =========================================================
+   LOWER PROMO STRIP
+   ========================================================= */
+
+.tx-offers-strip {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    margin-top: 55px;
+    padding: 28px 30px;
+    border: 1px solid #e6e6e6;
+    background: #fafafa;
+}
+
+.tx-offers-strip::after {
+    content: "";
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    right: -80px;
+    top: -80px;
+    border: 1px solid #e5e5e5;
+    border-radius: 50%;
+}
+
+.tx-offers-strip-content {
+    position: relative;
+    z-index: 2;
+}
+
+.tx-offers-strip-label {
+    margin: 0 0 5px;
+    color: #999;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.tx-offers-strip-title {
+    margin: 0;
+    color: #111;
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.tx-offers-strip-text {
+    margin: 5px 0 0;
+    color: #888;
+    font-size: 10px;
+}
+
+.tx-offers-shop-btn {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 18px;
+    border: 1px solid #111;
+    background: #111;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+.tx-offers-shop-btn:hover {
+    background: #fff;
+    color: #111;
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.tx-offers-empty {
+    padding: 85px 25px;
+    border: 1px solid #e6e6e6;
+    background: #fafafa;
+    text-align: center;
+}
+
+.tx-offers-empty-icon {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    color: #777;
+    font-size: 23px;
+}
+
+.tx-offers-empty h2 {
+    margin: 0 0 8px;
+    color: #111;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.tx-offers-empty p {
+    max-width: 420px;
+    margin: 0 auto 23px;
+    color: #888;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.tx-offers-empty-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background: #111;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .tx-offers-page {
+        padding: 22px 0 55px;
+    }
+
+    .tx-offers-hero {
+        min-height: 290px;
+        margin-bottom: 32px;
+        padding: 38px 25px;
+        align-items: flex-start;
+    }
+
+    .tx-offers-title {
+        font-size: 43px;
+        letter-spacing: -2px;
+    }
+
+    .tx-offers-description {
+        font-size: 11px;
+        max-width: 90%;
+    }
+
+    .tx-offers-count {
+        right: 25px;
+        bottom: 25px;
+    }
+
+    .tx-offers-section-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .tx-offers-section-title {
+        font-size: 22px;
+    }
+
+    .tx-offers-grid {
+        row-gap: 25px;
+    }
+
+    .tx-offers-strip {
+        align-items: flex-start;
+        flex-direction: column;
+        margin-top: 40px;
+        padding: 24px 20px;
+    }
+
+    .tx-offers-shop-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+}
+
+@media (max-width: 420px) {
+
+    .tx-offers-hero {
+        padding: 32px 20px;
+    }
+
+    .tx-offers-title {
+        font-size: 38px;
+    }
+
+    .tx-offer-badge {
+        top: 8px;
+        left: 8px;
+        padding: 6px 8px;
+        font-size: 7px;
+    }
+
+}
+
+</style>
+
+
+<div class="container tx-offers-page">
+
+
+    <!-- =====================================================
+         OFFERS HERO
+         ===================================================== -->
+
+    <section class="tx-offers-hero">
+
+        <div class="tx-offers-hero-content">
+
+            <p class="tx-offers-kicker">
+                TOMMY.X SPECIAL EDIT
+            </p>
+
+            <h1 class="tx-offers-title">
+                Offers<span>.</span>
+            </h1>
+
+            <p class="tx-offers-description">
+                Discover selected styles at special prices.
+                Limited pieces, premium fabrics and exclusive
+                TOMMY.X offers — while stocks last.
+            </p>
+
+        </div>
+
+        {% if products %}
+        <div class="tx-offers-count">
+            {{ products|length }} styles available
+        </div>
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         PRODUCT SECTION
+         ===================================================== -->
+
+    {% if products %}
+
+    <div class="tx-offers-section-head">
+
+        <div>
+            <p class="tx-offers-section-kicker">
+                Limited Selection
+            </p>
+
+            <h2 class="tx-offers-section-title">
+                Shop Current Offers
+            </h2>
+        </div>
+
+        <p class="tx-offers-section-note">
+            Limited stock · Selected styles
+        </p>
+
+    </div>
+
+
+    <div class="row g-3 g-md-4 tx-offers-grid">
+
+        {% for product in products %}
+
+        <div class="col-6 col-lg-3 tx-offer-product">
+
+            <div class="tx-offer-badge">
+                <i class="bi bi-lightning-charge-fill"></i>
+                Special Offer
+            </div>
+
+            {% include 'partials/product_card.html' %}
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- =====================================================
+         BOTTOM PROMO
+         ===================================================== -->
+
+    <section class="tx-offers-strip">
+
+        <div class="tx-offers-strip-content">
+
+            <p class="tx-offers-strip-label">
+                Keep Exploring
+            </p>
+
+            <h3 class="tx-offers-strip-title">
+                Find your next signature style.
+            </h3>
+
+            <p class="tx-offers-strip-text">
+                Explore the complete TOMMY.X collection.
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'core:home' %}"
+            class="tx-offers-shop-btn"
+        >
+            Explore Collection
+            <i class="bi bi-arrow-up-right"></i>
+        </a>
+
+    </section>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         EMPTY OFFERS
+         ===================================================== -->
+
+    <section class="tx-offers-empty">
+
+        <div class="tx-offers-empty-icon">
+            <i class="bi bi-tag"></i>
+        </div>
+
+        <h2>
+            No offers right now
+        </h2>
+
+        <p>
+            There are no active offers at the moment.
+            New deals and selected styles will appear here soon.
+        </p>
+
+        <a
+            href="{% url 'core:home' %}"
+            class="tx-offers-empty-btn"
+        >
+            Continue Shopping
+            <i class="bi bi-arrow-right"></i>
+        </a>
+
+    </section>
+
+    {% endif %}
+
+
 </div>
+
 {% endblock %}

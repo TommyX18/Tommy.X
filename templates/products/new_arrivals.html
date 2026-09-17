@@ -1,25 +1,1010 @@
 {% extends 'base.html' %}
+
 {% block title %}New Arrivals — TOMMY.X{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-  <h1 class="tx-page-title">New Arrivals</h1>
-  <div class="row g-4">
-    {% for product in products %}
-    <div class="col-6 col-lg-3">{% include 'partials/product_card.html' %}</div>
-    {% empty %}
-    <p class="text-muted py-4">No new arrivals yet — mark products as "New Arrival" in the admin.</p>
-    {% endfor %}
-  </div>
-  {% if page_obj.paginator.num_pages > 1 %}
-  <nav class="mt-5">
-    <ul class="pagination justify-content-center">
-      {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>{% endif %}
-      {% for num in page_obj.paginator.page_range %}
-      <li class="page-item {% if num == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-      {% endfor %}
-      {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
-    </ul>
-  </nav>
-  {% endif %}
+
+<style>
+
+/* =========================================================
+   TOMMY.X — NEW ARRIVALS
+   PREMIUM EDITORIAL COLLECTION PAGE
+   ========================================================= */
+
+.tx-new-page {
+    padding: 28px 0 90px;
+}
+
+
+/* =========================================================
+   BREADCRUMB
+   ========================================================= */
+
+.tx-new-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 22px;
+
+    color: #aaa;
+
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.tx-new-breadcrumb a {
+    color: #777;
+    text-decoration: none;
+
+    transition: color .2s ease;
+}
+
+.tx-new-breadcrumb a:hover {
+    color: #111;
+}
+
+.tx-new-breadcrumb i {
+    color: #bbb;
+    font-size: 7px;
+}
+
+
+/* =========================================================
+   EDITORIAL HERO
+   ========================================================= */
+
+.tx-new-hero {
+    position: relative;
+    overflow: hidden;
+
+    min-height: 355px;
+
+    margin-bottom: 42px;
+    padding: 52px 50px;
+
+    display: flex;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            110deg,
+            #111 0%,
+            #171717 48%,
+            #0b0b0b 100%
+        );
+
+    color: #fff;
+}
+
+
+/* large decorative ring */
+
+.tx-new-hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 500px;
+    height: 500px;
+
+    right: -170px;
+    top: -230px;
+
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 50%;
+}
+
+
+/* second ring */
+
+.tx-new-hero::after {
+    content: "";
+
+    position: absolute;
+
+    width: 330px;
+    height: 330px;
+
+    right: 45px;
+    bottom: -250px;
+
+    border: 1px solid rgba(255,255,255,.045);
+    border-radius: 50%;
+}
+
+
+.tx-new-hero-content {
+    position: relative;
+    z-index: 3;
+
+    max-width: 650px;
+}
+
+
+.tx-new-kicker {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    margin: 0 0 15px;
+
+    color: #ff3b30;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+.tx-new-kicker::before {
+    content: "";
+
+    width: 25px;
+    height: 1px;
+
+    background: #ff3b30;
+}
+
+
+.tx-new-title {
+    margin: 0 0 18px;
+
+    color: #fff;
+
+    font-size: clamp(43px, 7vw, 76px);
+    font-weight: 900;
+
+    line-height: .88;
+    letter-spacing: -4px;
+}
+
+.tx-new-title span {
+    color: rgba(255,255,255,.28);
+}
+
+
+.tx-new-description {
+    max-width: 500px;
+
+    margin: 0;
+
+    color: rgba(255,255,255,.56);
+
+    font-size: 12px;
+    line-height: 1.85;
+}
+
+
+/* =========================================================
+   HERO SIDE LABEL
+   ========================================================= */
+
+.tx-new-edition {
+    position: absolute;
+    z-index: 4;
+
+    right: 45px;
+    bottom: 40px;
+
+    writing-mode: vertical-rl;
+
+    color: rgba(255,255,255,.25);
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   COLLECTION INFO
+   ========================================================= */
+
+.tx-new-intro {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+}
+
+
+.tx-new-intro-kicker {
+    margin: 0 0 6px;
+
+    color: #ff3b30;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-new-intro-title {
+    margin: 0;
+
+    color: #111;
+
+    font-size: 25px;
+    font-weight: 900;
+
+    letter-spacing: -.8px;
+}
+
+
+.tx-new-intro-note {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #999;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.tx-new-intro-note i {
+    color: #111;
+}
+
+
+/* =========================================================
+   PRODUCT GRID
+   ========================================================= */
+
+.tx-new-grid {
+    row-gap: 38px;
+}
+
+
+/* =========================================================
+   NEW LABEL
+   ========================================================= */
+
+.tx-new-product {
+    position: relative;
+}
+
+
+.tx-new-label {
+    position: absolute;
+    z-index: 20;
+
+    top: 12px;
+    left: 12px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 8px 10px;
+
+    background: #fff;
+    color: #111;
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing: 1.2px;
+
+    text-transform: uppercase;
+
+    box-shadow: 0 8px 22px rgba(0,0,0,.10);
+
+    pointer-events: none;
+}
+
+
+.tx-new-label i {
+    font-size: 8px;
+}
+
+
+/* =========================================================
+   PRODUCT NUMBER
+   ========================================================= */
+
+.tx-new-product-number {
+    position: absolute;
+    z-index: 20;
+
+    right: 13px;
+    bottom: 12px;
+
+    color: rgba(255,255,255,.75);
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    pointer-events: none;
+
+    mix-blend-mode: difference;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.tx-new-empty {
+    padding: 90px 25px;
+
+    border: 1px solid #e4e4e4;
+
+    background: #fafafa;
+
+    text-align: center;
+}
+
+
+.tx-new-empty-icon {
+    width: 70px;
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 20px;
+
+    border: 1px solid #ddd;
+    border-radius: 50%;
+
+    color: #777;
+
+    font-size: 22px;
+}
+
+
+.tx-new-empty h2 {
+    margin: 0 0 8px;
+
+    color: #111;
+
+    font-size: 20px;
+    font-weight: 900;
+}
+
+
+.tx-new-empty p {
+    max-width: 420px;
+
+    margin: 0 auto 23px;
+
+    color: #888;
+
+    font-size: 10px;
+
+    line-height: 1.8;
+}
+
+
+.tx-new-empty-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 12px 18px;
+
+    background: #111;
+    color: #fff;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    text-decoration: none;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.tx-new-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    margin-top: 55px;
+}
+
+
+.tx-new-pagination a,
+.tx-new-pagination span {
+    min-width: 37px;
+    height: 37px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #e1e1e1;
+
+    background: #fff;
+    color: #777;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    text-decoration: none;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease;
+}
+
+
+.tx-new-pagination a:hover {
+    border-color: #111;
+
+    background: #111;
+    color: #fff;
+}
+
+
+.tx-new-pagination .active {
+    border-color: #111;
+
+    background: #111;
+    color: #fff;
+}
+
+
+.tx-new-pagination .arrow {
+    padding: 0 13px;
+
+    gap: 6px;
+
+    font-size: 7px;
+
+    letter-spacing: .7px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   BOTTOM BRAND STATEMENT
+   ========================================================= */
+
+.tx-new-footer-banner {
+    position: relative;
+    overflow: hidden;
+
+    margin-top: 65px;
+
+    padding: 35px 40px;
+
+    border-top: 1px solid #e4e4e4;
+    border-bottom: 1px solid #e4e4e4;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 30px;
+}
+
+
+.tx-new-footer-banner::after {
+    content: "X";
+
+    position: absolute;
+
+    right: 30px;
+    top: -35px;
+
+    color: #f3f3f3;
+
+    font-size: 130px;
+    font-weight: 900;
+
+    line-height: 1;
+}
+
+
+.tx-new-footer-content {
+    position: relative;
+    z-index: 2;
+}
+
+
+.tx-new-footer-label {
+    margin: 0 0 6px;
+
+    color: #999;
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-new-footer-title {
+    margin: 0;
+
+    color: #111;
+
+    font-size: 19px;
+    font-weight: 900;
+}
+
+
+.tx-new-footer-link {
+    position: relative;
+    z-index: 3;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #111;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+
+.tx-new-footer-link i {
+    transition: transform .25s ease;
+}
+
+
+.tx-new-footer-link:hover i {
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .tx-new-page {
+        padding: 20px 0 60px;
+    }
+
+
+    .tx-new-hero {
+        min-height: 310px;
+
+        margin-bottom: 32px;
+
+        padding: 38px 22px;
+
+        align-items: flex-start;
+    }
+
+
+    .tx-new-title {
+        font-size: 48px;
+
+        letter-spacing: -3px;
+    }
+
+
+    .tx-new-description {
+        max-width: 88%;
+
+        font-size: 10px;
+    }
+
+
+    .tx-new-edition {
+        right: 20px;
+        bottom: 25px;
+    }
+
+
+    .tx-new-intro {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 6px;
+
+        margin-bottom: 18px;
+    }
+
+
+    .tx-new-intro-title {
+        font-size: 22px;
+    }
+
+
+    .tx-new-grid {
+        row-gap: 28px;
+    }
+
+
+    .tx-new-label {
+        top: 8px;
+        left: 8px;
+
+        padding: 6px 8px;
+
+        font-size: 6px;
+    }
+
+
+    .tx-new-product-number {
+        right: 9px;
+        bottom: 9px;
+    }
+
+
+    .tx-new-pagination {
+        margin-top: 40px;
+    }
+
+
+    .tx-new-pagination a,
+    .tx-new-pagination span {
+        min-width: 33px;
+        height: 33px;
+    }
+
+
+    .tx-new-pagination .arrow {
+        padding: 0 9px;
+    }
+
+
+    .tx-new-footer-banner {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        margin-top: 45px;
+
+        padding: 28px 22px;
+    }
+
+
+    .tx-new-footer-link {
+        margin-top: 3px;
+    }
+
+}
+
+
+@media (max-width: 420px) {
+
+    .tx-new-hero {
+        padding: 32px 18px;
+    }
+
+
+    .tx-new-title {
+        font-size: 42px;
+    }
+
+
+    .tx-new-edition {
+        right: 16px;
+    }
+
+}
+
+</style>
+
+
+<div class="container tx-new-page">
+
+
+    <!-- =====================================================
+         BREADCRUMB
+         ===================================================== -->
+
+    <div class="tx-new-breadcrumb">
+
+        <a href="{% url 'core:home' %}">
+            Home
+        </a>
+
+        <i class="bi bi-chevron-right"></i>
+
+        <span>
+            New Arrivals
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <section class="tx-new-hero">
+
+        <div class="tx-new-hero-content">
+
+            <p class="tx-new-kicker">
+                The Latest Drop
+            </p>
+
+
+            <h1 class="tx-new-title">
+                New<br>
+                Arrivals<span>.</span>
+            </h1>
+
+
+            <p class="tx-new-description">
+                Meet the latest additions to TOMMY.X.
+                Fresh silhouettes, contemporary details and
+                carefully selected pieces made for your
+                everyday wardrobe.
+            </p>
+
+        </div>
+
+
+        <div class="tx-new-edition">
+            TOMMY.X / NEW SEASON
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         COLLECTION HEADER
+         ===================================================== -->
+
+    <div class="tx-new-intro">
+
+        <div>
+
+            <p class="tx-new-intro-kicker">
+                Just In
+            </p>
+
+            <h2 class="tx-new-intro-title">
+                Latest Styles
+            </h2>
+
+        </div>
+
+
+        {% if page_obj.paginator.count %}
+
+        <div class="tx-new-intro-note">
+
+            <i class="bi bi-stars"></i>
+
+            {{ page_obj.paginator.count }}
+            new styles
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         PRODUCTS
+         ===================================================== -->
+
+    {% if products %}
+
+    <div class="row g-3 g-md-4 tx-new-grid">
+
+
+        {% for product in products %}
+
+        <div class="col-6 col-lg-3 tx-new-product">
+
+
+            <!-- NEW LABEL -->
+
+            <div class="tx-new-label">
+
+                <i class="bi bi-stars"></i>
+
+                New
+
+            </div>
+
+
+            <!-- PRODUCT -->
+
+            {% include 'partials/product_card.html' %}
+
+
+            <!-- PRODUCT INDEX -->
+
+            <span class="tx-new-product-number">
+
+                {{ forloop.counter|stringformat:"02d" }}
+
+            </span>
+
+
+        </div>
+
+        {% endfor %}
+
+
+    </div>
+
+
+    <!-- =====================================================
+         PAGINATION
+         ===================================================== -->
+
+    {% if page_obj.paginator.num_pages > 1 %}
+
+    <nav
+        class="tx-new-pagination"
+        aria-label="New arrivals pagination"
+    >
+
+
+        {% if page_obj.has_previous %}
+
+        <a
+            href="?page={{ page_obj.previous_page_number }}"
+            class="arrow"
+        >
+
+            <i class="bi bi-arrow-left"></i>
+
+            Prev
+
+        </a>
+
+        {% endif %}
+
+
+        {% for num in page_obj.paginator.page_range %}
+
+        <a
+            href="?page={{ num }}"
+            class="{% if num == page_obj.number %}active{% endif %}"
+        >
+
+            {{ num }}
+
+        </a>
+
+        {% endfor %}
+
+
+        {% if page_obj.has_next %}
+
+        <a
+            href="?page={{ page_obj.next_page_number }}"
+            class="arrow"
+        >
+
+            Next
+
+            <i class="bi bi-arrow-right"></i>
+
+        </a>
+
+        {% endif %}
+
+
+    </nav>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         BRAND FOOTER
+         ===================================================== -->
+
+    <section class="tx-new-footer-banner">
+
+        <div class="tx-new-footer-content">
+
+            <p class="tx-new-footer-label">
+                TOMMY.X COLLECTION
+            </p>
+
+            <h3 class="tx-new-footer-title">
+                Define your everyday style.
+            </h3>
+
+        </div>
+
+
+        <a
+            href="{% url 'core:home' %}"
+            class="tx-new-footer-link"
+        >
+
+            Explore Collection
+
+            <i class="bi bi-arrow-right"></i>
+
+        </a>
+
+    </section>
+
+
+    {% else %}
+
+
+    <!-- =====================================================
+         EMPTY STATE
+         ===================================================== -->
+
+    <section class="tx-new-empty">
+
+        <div class="tx-new-empty-icon">
+
+            <i class="bi bi-stars"></i>
+
+        </div>
+
+
+        <h2>
+            New styles are coming soon
+        </h2>
+
+
+        <p>
+            No products have been marked as new arrivals yet.
+            Check back soon for the latest TOMMY.X collection.
+        </p>
+
+
+        <a
+            href="{% url 'core:home' %}"
+            class="tx-new-empty-btn"
+        >
+
+            Continue Shopping
+
+            <i class="bi bi-arrow-right"></i>
+
+        </a>
+
+    </section>
+
+
+    {% endif %}
+
+
 </div>
+
 {% endblock %}

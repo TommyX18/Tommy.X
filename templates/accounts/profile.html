@@ -1,39 +1,1517 @@
 {% extends 'base.html' %}
 {% load humanize %}
-{% block title %}My Profile — TOMMY.X{% endblock %}
-{% block content %}
-<div class="container py-4">
-  <h1 class="tx-page-title">My Account</h1>
-  <div class="row g-4">
-    <div class="col-lg-3">
-      <div class="list-group">
-        <a class="list-group-item list-group-item-action active" style="background:var(--tx-black);border-color:var(--tx-black);">Dashboard</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'orders:history' %}">Orders</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'accounts:addresses' %}">Addresses</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'wishlist:detail' %}">Wishlist</a>
-        <form method="post" action="{% url 'accounts:logout' %}">
-          {% csrf_token %}
-          <button type="submit" class="list-group-item list-group-item-action text-danger w-100 text-start border-0">Logout</button>
-        </form>
-      </div>
-    </div>
-    <div class="col-lg-9">
-      <div class="border rounded p-4 mb-4" style="border-color:var(--tx-line)!important;">
-        <h5>Hi, {{ user.username }}</h5>
-        <p class="text-muted mb-0">{{ user.email }}</p>
-      </div>
 
-      <h6 class="tx-footer-heading text-dark">Recent Orders</h6>
-      {% for order in orders %}
-      <div class="border-bottom py-2 d-flex justify-content-between">
-        <span>{{ order.order_number }} <span class="text-muted small">({{ order.created_at|date:"d M Y" }})</span></span>
-        <span>Rs.{{ order.grand_total|intcomma }} · {{ order.get_status_display }}</span>
-      </div>
-      {% empty %}
-      <p class="text-muted">No orders yet.</p>
-      {% endfor %}
-      <a href="{% url 'orders:history' %}" class="tx-section-link d-inline-block mt-3">View all orders</a>
+{% block title %}My Profile — TOMMY.X{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+   TOMMY.X ACCOUNT DASHBOARD
+   ========================================================= */
+
+.tx-account-page {
+    padding: 45px 0 80px;
+}
+
+
+/* =========================================================
+   ACCOUNT HERO
+   ========================================================= */
+
+.tx-account-hero {
+    position: relative;
+
+    overflow: hidden;
+
+    min-height: 225px;
+
+    display: flex;
+    align-items: flex-end;
+
+    margin-bottom: 28px;
+
+    padding: 35px;
+
+    background:
+        linear-gradient(
+            110deg,
+            #111 0%,
+            #181818 55%,
+            #0a0a0a 100%
+        );
+
+    color: #fff;
+}
+
+.tx-account-hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    right: -90px;
+    top: -120px;
+
+    border: 1px solid rgba(255,255,255,.07);
+
+    border-radius: 50%;
+}
+
+.tx-account-hero::after {
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    right: 45px;
+    bottom: -100px;
+
+    border: 1px solid rgba(255,255,255,.05);
+
+    border-radius: 50%;
+}
+
+
+.tx-account-hero-content {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+}
+
+
+/* =========================================================
+   USER IDENTITY
+   ========================================================= */
+
+.tx-account-identity {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+
+.tx-account-avatar {
+    width: 76px;
+    height: 76px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 1px solid rgba(255,255,255,.20);
+
+    background: rgba(255,255,255,.08);
+
+    color: #fff;
+
+    font-size: 25px;
+
+    font-weight: 900;
+
+    letter-spacing: 1px;
+}
+
+
+.tx-account-kicker {
+    margin: 0 0 8px;
+
+    color: rgba(255,255,255,.45);
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-account-name {
+    margin: 0 0 6px;
+
+    color: #fff;
+
+    font-size: clamp(26px, 4vw, 38px);
+
+    font-weight: 900;
+
+    letter-spacing: -1.5px;
+}
+
+
+.tx-account-email {
+    margin: 0;
+
+    color: rgba(255,255,255,.55);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   ACCOUNT BADGE
+   ========================================================= */
+
+.tx-account-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 8px 12px;
+
+    border: 1px solid rgba(255,255,255,.13);
+
+    background: rgba(255,255,255,.06);
+
+    color: rgba(255,255,255,.65);
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.tx-account-badge i {
+    color: var(--tx-orange, #ff3b30);
+}
+
+
+/* =========================================================
+   MAIN GRID
+   ========================================================= */
+
+.tx-account-layout {
+    display: grid;
+
+    grid-template-columns: 250px minmax(0, 1fr);
+
+    gap: 28px;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.tx-account-sidebar {
+    height: fit-content;
+
+    position: sticky;
+
+    top: 25px;
+
+    border: 1px solid var(--tx-line, #e5e5e5);
+
+    background: #fff;
+}
+
+
+.tx-sidebar-heading {
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #ededed;
+
+    color: #999;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-account-nav {
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.tx-account-nav-link {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 51px;
+
+    padding: 0 20px;
+
+    border-bottom: 1px solid #f0f0f0;
+
+    color: #555;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        padding .2s ease;
+}
+
+
+.tx-account-nav-link i {
+    width: 18px;
+
+    color: #999;
+
+    font-size: 15px;
+
+    text-align: center;
+
+    transition: color .2s ease;
+}
+
+
+.tx-account-nav-link:hover {
+    padding-left: 24px;
+
+    background: #fafafa;
+
+    color: #111;
+}
+
+
+.tx-account-nav-link:hover i {
+    color: #111;
+}
+
+
+.tx-account-nav-link.active {
+    background: #111;
+
+    color: #fff;
+}
+
+
+.tx-account-nav-link.active i {
+    color: var(--tx-orange, #ff3b30);
+}
+
+
+.tx-account-logout {
+    width: 100%;
+
+    border: 0;
+
+    border-bottom: 0;
+
+    background: transparent;
+
+    color: #b44 !important;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
+
+.tx-account-logout i {
+    color: #b44 !important;
+}
+
+
+/* =========================================================
+   SIDEBAR FOOTER
+   ========================================================= */
+
+.tx-sidebar-footer {
+    padding: 17px 20px;
+
+    background: #fafafa;
+
+    border-top: 1px solid #ededed;
+}
+
+.tx-sidebar-footer span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #aaa;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+.tx-sidebar-footer strong {
+    color: #333;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.tx-account-content {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   QUICK STATS
+   ========================================================= */
+
+.tx-account-stats {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 12px;
+
+    margin-bottom: 28px;
+}
+
+
+.tx-stat-card {
+    position: relative;
+
+    overflow: hidden;
+
+    min-height: 105px;
+
+    padding: 20px;
+
+    border: 1px solid var(--tx-line, #e5e5e5);
+
+    background: #fff;
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+}
+
+
+.tx-stat-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.06);
+}
+
+
+.tx-stat-icon {
+    position: absolute;
+
+    right: 18px;
+    top: 18px;
+
+    color: #eee;
+
+    font-size: 25px;
+}
+
+
+.tx-stat-label {
+    margin: 0 0 9px;
+
+    color: #999;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-stat-value {
+    margin: 0;
+
+    color: #111;
+
+    font-size: 23px;
+
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   WELCOME CARD
+   ========================================================= */
+
+.tx-welcome-card {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 22px 24px;
+
+    margin-bottom: 28px;
+
+    border: 1px solid #ededed;
+
+    background:
+        linear-gradient(
+            100deg,
+            #fafafa,
+            #fff
+        );
+}
+
+
+.tx-welcome-text h2 {
+    margin: 0 0 6px;
+
+    font-size: 17px;
+
+    font-weight: 800;
+}
+
+
+.tx-welcome-text p {
+    margin: 0;
+
+    color: #777;
+
+    font-size: 11px;
+
+    line-height: 1.6;
+}
+
+
+.tx-welcome-action {
+    flex-shrink: 0;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 11px 15px;
+
+    border: 1px solid #ddd;
+
+    background: #fff;
+
+    color: #222;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    text-decoration: none;
+
+    text-transform: uppercase;
+
+    transition:
+        background .2s ease,
+        color .2s ease;
+}
+
+
+.tx-welcome-action:hover {
+    background: #111;
+
+    border-color: #111;
+
+    color: #fff;
+}
+
+
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+
+.tx-account-section-header {
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 14px;
+}
+
+
+.tx-section-kicker {
+    margin: 0 0 5px;
+
+    color: var(--tx-orange, #ff3b30);
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-account-section-title {
+    margin: 0;
+
+    color: #111;
+
+    font-size: 20px;
+
+    font-weight: 850;
+}
+
+
+.tx-view-all {
+    color: #777;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: .8px;
+
+    text-decoration: none;
+
+    text-transform: uppercase;
+}
+
+
+.tx-view-all:hover {
+    color: #111;
+}
+
+
+/* =========================================================
+   ORDER LIST
+   ========================================================= */
+
+.tx-orders-card {
+    overflow: hidden;
+
+    border: 1px solid var(--tx-line, #e5e5e5);
+
+    background: #fff;
+}
+
+
+.tx-order-row {
+    display: grid;
+
+    grid-template-columns: minmax(170px, 1.3fr) 120px 150px;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #ededed;
+
+    transition: background .2s ease;
+}
+
+
+.tx-order-row:last-child {
+    border-bottom: 0;
+}
+
+
+.tx-order-row:hover {
+    background: #fafafa;
+}
+
+
+/* =========================================================
+   ORDER NUMBER
+   ========================================================= */
+
+.tx-order-number {
+    margin: 0 0 5px;
+
+    color: #111;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: .3px;
+}
+
+
+.tx-order-date {
+    margin: 0;
+
+    color: #999;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   ORDER PRICE
+   ========================================================= */
+
+.tx-order-price-label {
+    margin: 0 0 4px;
+
+    color: #aaa;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-order-price {
+    margin: 0;
+
+    color: #111;
+
+    font-size: 13px;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   ORDER STATUS
+   ========================================================= */
+
+.tx-order-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 7px;
+
+    color: #666;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+}
+
+
+.tx-status-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #888;
+}
+
+
+/* =========================================================
+   EMPTY ORDERS
+   ========================================================= */
+
+.tx-orders-empty {
+    padding: 55px 25px;
+
+    text-align: center;
+}
+
+
+.tx-orders-empty-icon {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin: 0 auto 16px;
+
+    border: 1px solid #e5e5e5;
+
+    border-radius: 50%;
+
+    color: #888;
+
+    font-size: 20px;
+}
+
+
+.tx-orders-empty h3 {
+    margin: 0 0 7px;
+
+    font-size: 16px;
+
+    font-weight: 800;
+}
+
+
+.tx-orders-empty p {
+    margin: 0 0 20px;
+
+    color: #888;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   QUICK LINKS
+   ========================================================= */
+
+.tx-account-quick {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 12px;
+
+    margin-top: 28px;
+}
+
+
+.tx-quick-card {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 18px;
+
+    border: 1px solid #ededed;
+
+    background: #fff;
+
+    color: #111;
+
+    text-decoration: none;
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.tx-quick-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #ccc;
+
+    color: #111;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.05);
+}
+
+
+.tx-quick-icon {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #f7f7f7;
+
+    color: #555;
+
+    font-size: 16px;
+}
+
+
+.tx-quick-card h3 {
+    margin: 0 0 4px;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+
+.tx-quick-card p {
+    margin: 0;
+
+    color: #999;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .tx-account-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .tx-account-sidebar {
+        position: static;
+    }
+
+    .tx-account-nav {
+        display: grid;
+
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .tx-account-nav-link {
+        justify-content: center;
+
+        padding: 14px 8px;
+
+        flex-direction: column;
+
+        gap: 5px;
+
+        min-height: 70px;
+
+        border-right: 1px solid #ededed;
+    }
+
+    .tx-account-nav-link:hover {
+        padding-left: 8px;
+    }
+
+    .tx-account-nav-link.active {
+        padding-left: 8px;
+    }
+
+    .tx-account-logout {
+        width: auto;
+
+        text-align: center;
+    }
+
+    .tx-sidebar-heading,
+    .tx-sidebar-footer {
+        display: none;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .tx-account-page {
+        padding: 25px 0 55px;
+    }
+
+    .tx-account-hero {
+        min-height: auto;
+
+        padding: 25px 20px;
+    }
+
+    .tx-account-hero-content {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 18px;
+    }
+
+    .tx-account-avatar {
+        width: 62px;
+        height: 62px;
+
+        font-size: 20px;
+    }
+
+    .tx-account-name {
+        font-size: 28px;
+    }
+
+    .tx-account-badge {
+        align-self: flex-start;
+    }
+
+    .tx-account-nav {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tx-account-stats {
+        grid-template-columns: 1fr;
+
+        gap: 8px;
+    }
+
+    .tx-stat-card {
+        min-height: 82px;
+
+        padding: 16px;
+    }
+
+    .tx-stat-value {
+        font-size: 20px;
+    }
+
+    .tx-welcome-card {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .tx-welcome-action {
+        width: 100%;
+
+        justify-content: center;
+    }
+
+    .tx-order-row {
+        grid-template-columns: 1fr;
+
+        gap: 9px;
+
+        padding: 17px;
+    }
+
+    .tx-order-status {
+        justify-content: flex-start;
+    }
+
+    .tx-account-quick {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 420px) {
+
+    .tx-account-identity {
+        align-items: flex-start;
+
+        gap: 13px;
+    }
+
+    .tx-account-avatar {
+        width: 54px;
+        height: 54px;
+    }
+
+    .tx-account-name {
+        font-size: 24px;
+    }
+
+    .tx-account-email {
+        max-width: 220px;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+    }
+
+    .tx-account-nav-link {
+        font-size: 10px;
+    }
+
+}
+
+</style>
+
+
+<div class="container tx-account-page">
+
+
+    <!-- =====================================================
+         ACCOUNT HERO
+         ===================================================== -->
+
+    <section class="tx-account-hero">
+
+        <div class="tx-account-hero-content">
+
+
+            <div class="tx-account-identity">
+
+                <div class="tx-account-avatar">
+                    {{ user.username|first|upper }}
+                </div>
+
+                <div>
+
+                    <p class="tx-account-kicker">
+                        TOMMY.X MEMBER
+                    </p>
+
+                    <h1 class="tx-account-name">
+                        {{ user.username }}
+                    </h1>
+
+                    <p class="tx-account-email">
+                        {{ user.email }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="tx-account-badge">
+
+                <i class="bi bi-patch-check-fill"></i>
+
+                Account Active
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ACCOUNT LAYOUT
+         ===================================================== -->
+
+    <div class="tx-account-layout">
+
+
+        <!-- =================================================
+             SIDEBAR
+             ================================================= -->
+
+        <aside class="tx-account-sidebar">
+
+            <div class="tx-sidebar-heading">
+                Account Menu
+            </div>
+
+
+            <nav class="tx-account-nav">
+
+
+                <!-- DASHBOARD -->
+
+                <a
+                    href="{% url 'accounts:profile' %}"
+                    class="tx-account-nav-link active"
+                >
+                    <i class="bi bi-grid-1x2"></i>
+                    <span>Dashboard</span>
+                </a>
+
+
+                <!-- ORDERS -->
+
+                <a
+                    href="{% url 'orders:history' %}"
+                    class="tx-account-nav-link"
+                >
+                    <i class="bi bi-bag-check"></i>
+                    <span>Orders</span>
+                </a>
+
+
+                <!-- ADDRESSES -->
+
+                <a
+                    href="{% url 'accounts:addresses' %}"
+                    class="tx-account-nav-link"
+                >
+                    <i class="bi bi-geo-alt"></i>
+                    <span>Addresses</span>
+                </a>
+
+
+                <!-- WISHLIST -->
+
+                <a
+                    href="{% url 'wishlist:detail' %}"
+                    class="tx-account-nav-link"
+                >
+                    <i class="bi bi-heart"></i>
+                    <span>Wishlist</span>
+                </a>
+
+
+                <!-- LOGOUT -->
+
+                <form
+                    method="post"
+                    action="{% url 'accounts:logout' %}"
+                    style="margin:0;"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="tx-account-nav-link tx-account-logout"
+                    >
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Logout</span>
+                    </button>
+
+                </form>
+
+
+            </nav>
+
+
+            <div class="tx-sidebar-footer">
+
+                <span>
+                    Member
+                </span>
+
+                <strong>
+                    TOMMY.X Account
+                </strong>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             MAIN CONTENT
+             ================================================= -->
+
+        <main class="tx-account-content">
+
+
+            <!-- =================================================
+                 QUICK STATS
+                 ================================================= -->
+
+            <div class="tx-account-stats">
+
+
+                <div class="tx-stat-card">
+
+                    <i class="bi bi-bag-check tx-stat-icon"></i>
+
+                    <p class="tx-stat-label">
+                        Recent Orders
+                    </p>
+
+                    <p class="tx-stat-value">
+                        {{ orders|length }}
+                    </p>
+
+                </div>
+
+
+                <div class="tx-stat-card">
+
+                    <i class="bi bi-geo-alt tx-stat-icon"></i>
+
+                    <p class="tx-stat-label">
+                        Saved Addresses
+                    </p>
+
+                    <p class="tx-stat-value">
+                        {{ addresses|length }}
+                    </p>
+
+                </div>
+
+
+                <div class="tx-stat-card">
+
+                    <i class="bi bi-person-check tx-stat-icon"></i>
+
+                    <p class="tx-stat-label">
+                        Account
+                    </p>
+
+                    <p class="tx-stat-value">
+                        Active
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 WELCOME CARD
+                 ================================================= -->
+
+            <div class="tx-welcome-card">
+
+                <div class="tx-welcome-text">
+
+                    <h2>
+                        Welcome back, {{ user.username }}.
+                    </h2>
+
+                    <p>
+                        Manage your orders, addresses and TOMMY.X
+                        account from one place.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="{% url 'core:home' %}"
+                    class="tx-welcome-action"
+                >
+                    Shop Collection
+                    <i class="bi bi-arrow-up-right"></i>
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 RECENT ORDERS HEADER
+                 ================================================= -->
+
+            <div class="tx-account-section-header">
+
+                <div>
+
+                    <p class="tx-section-kicker">
+                        Your Activity
+                    </p>
+
+                    <h2 class="tx-account-section-title">
+                        Recent Orders
+                    </h2>
+
+                </div>
+
+
+                <a
+                    href="{% url 'orders:history' %}"
+                    class="tx-view-all"
+                >
+                    View All
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 ORDERS
+                 ================================================= -->
+
+            <div class="tx-orders-card">
+
+
+                {% for order in orders %}
+
+                <div class="tx-order-row">
+
+
+                    <!-- ORDER -->
+
+                    <div>
+
+                        <p class="tx-order-number">
+                            {{ order.order_number }}
+                        </p>
+
+                        <p class="tx-order-date">
+                            Placed on
+                            {{ order.created_at|date:"d M Y" }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- PRICE -->
+
+                    <div>
+
+                        <p class="tx-order-price-label">
+                            Total
+                        </p>
+
+                        <p class="tx-order-price">
+                            Rs.{{ order.grand_total|intcomma }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="tx-order-status">
+
+                        <span class="tx-status-dot"></span>
+
+                        {{ order.get_status_display }}
+
+                    </div>
+
+
+                </div>
+
+                {% empty %}
+
+
+                <div class="tx-orders-empty">
+
+                    <div class="tx-orders-empty-icon">
+
+                        <i class="bi bi-bag"></i>
+
+                    </div>
+
+                    <h3>
+                        No orders yet
+                    </h3>
+
+                    <p>
+                        Your TOMMY.X orders will appear here once
+                        you make your first purchase.
+                    </p>
+
+                    <a
+                        href="{% url 'core:home' %}"
+                        class="tx-btn-primary"
+                    >
+                        Start Shopping
+                    </a>
+
+                </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+            <!-- =================================================
+                 QUICK ACCESS
+                 ================================================= -->
+
+            <div class="tx-account-quick">
+
+
+                <a
+                    href="{% url 'accounts:addresses' %}"
+                    class="tx-quick-card"
+                >
+
+                    <div class="tx-quick-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Manage Addresses
+                        </h3>
+
+                        <p>
+                            {{ addresses|length }}
+                            saved address{{ addresses|length|pluralize }}
+                        </p>
+
+                    </div>
+
+                    <i class="bi bi-arrow-right ms-auto"></i>
+
+                </a>
+
+
+                <a
+                    href="{% url 'wishlist:detail' %}"
+                    class="tx-quick-card"
+                >
+
+                    <div class="tx-quick-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Your Wishlist
+                        </h3>
+
+                        <p>
+                            View your saved styles
+                        </p>
+
+                    </div>
+
+                    <i class="bi bi-arrow-right ms-auto"></i>
+
+                </a>
+
+
+            </div>
+
+
+        </main>
+
     </div>
-  </div>
+
 </div>
+
 {% endblock %}

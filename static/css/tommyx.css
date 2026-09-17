@@ -136,7 +136,14 @@ a { text-decoration: none; color: inherit; transition: color .2s ease, opacity .
 
 /* ---------- Sections ---------- */
 .tx-section { padding: 70px 0; }
-.tx-section-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; }
+.tx-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 32px;
+}
 .tx-section-title {
   font-family: var(--tx-font-display);
   font-size: 2.4rem; letter-spacing: .06em; margin: 0;
@@ -146,9 +153,26 @@ a { text-decoration: none; color: inherit; transition: color .2s ease, opacity .
 .tx-section-alt { background: var(--tx-panel); }
 
 /* ---------- Category tiles ---------- */
-.tx-cat-tile { position: relative; display: block; overflow: hidden; border-radius: 2px; margin-bottom: 8px; }
-.tx-cat-tile img { width: 100%; aspect-ratio: 3/4; object-fit: cover; transition: transform .5s ease; }
-.tx-cat-tile:hover img { transform: scale(1.06); }
+.tx-cat-tile {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.tx-cat-tile img {
+    width: 100%;
+    aspect-ratio: 4/5;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    transition: transform .5s ease;
+}
+
+.tx-cat-tile:hover img {
+    transform: scale(1.06);
+}
 .tx-cat-tile-label {
   position: absolute; left: 0; right: 0; bottom: 0;
   padding: 16px; text-align: center;
@@ -158,7 +182,7 @@ a { text-decoration: none; color: inherit; transition: color .2s ease, opacity .
 }
 
 /* ---------- Product cards ---------- */
-.tx-product-card { position: relative; }
+.tx-product-card { position: relative; height: 100%; display: flex; flex-direction: column; }
 .tx-product-img-wrap {
   background: var(--tx-panel);
   aspect-ratio: 3/4;
@@ -189,7 +213,7 @@ a { text-decoration: none; color: inherit; transition: color .2s ease, opacity .
   display: flex; align-items: center; justify-content: center;
   font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600;
 }
-.tx-product-name { font-size: .92rem; margin: 0 0 4px; color: var(--tx-black); }
+.tx-product-name { font-size: .92rem; margin: 0 0 4px; color: var(--tx-black); min-height: 2.6em; }
 .tx-product-name a:hover { color: var(--tx-orange); }
 .tx-price { font-weight: 600; font-size: 1rem; }
 .tx-mrp { color: var(--tx-grey); text-decoration: line-through; font-size: .85rem; margin-left: 6px; }
@@ -198,6 +222,27 @@ a { text-decoration: none; color: inherit; transition: color .2s ease, opacity .
 .tx-page-head { padding: 30px 0 10px; }
 .tx-breadcrumb { font-size: .8rem; color: var(--tx-grey); text-transform: uppercase; letter-spacing: .05em; }
 .tx-page-title { font-family: var(--tx-font-display); font-size: 3rem; letter-spacing: .05em; margin: 4px 0 20px; }
+.tx-category-banner {
+  position: relative;
+  margin-top: 18px;
+  overflow: hidden;
+  background: var(--tx-panel);
+  aspect-ratio: 16 / 5;
+}
+.tx-category-banner img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.tx-category-banner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 32px;
+  color: #fff;
+  background: linear-gradient(0deg, rgba(20,20,20,.72), transparent 65%);
+}
+.tx-category-banner-overlay h1 { font-family: var(--tx-font-display); font-size: clamp(2.2rem, 5vw, 4.5rem); letter-spacing: .06em; margin: 0; }
+.tx-category-banner-overlay p { max-width: 560px; margin: 6px 0 0; }
 
 .tx-filters { border-top: 1px solid var(--tx-line); }
 .tx-filter-group { border-bottom: 1px solid var(--tx-line); padding: 16px 0; }
@@ -271,6 +316,14 @@ a { text-decoration: none; color: inherit; transition: color .2s ease, opacity .
   .tx-hero { min-height: 30vh; }
   .tx-section { padding: 40px 0; }
   .tx-page-title { font-size: 2.1rem; }
+  .tx-category-banner { aspect-ratio: 3 / 2; }
+  .tx-category-banner-overlay { padding: 22px; }
+}
+
+@media (max-width: 575.98px) {
+  .tx-category-banner { aspect-ratio: 4 / 3; }
+  .tx-category-banner-overlay { padding: 18px; }
+  .tx-category-banner-overlay p { font-size: .88rem; }
 }
 
 
@@ -392,4 +445,497 @@ a { text-decoration: none; color: inherit; transition: color .2s ease, opacity .
     width: 140px;
     max-height: 38px;
   }
+}
+.tx-category-banner {
+    position: relative;
+    width: 100%;
+  aspect-ratio: 16 / 5;
+  height: auto;
+  margin: 20px 0 30px;
+    overflow: hidden;
+  border-radius: 2px;
+    background: #111;
+}
+
+.tx-category-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tx-category-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.75),
+        rgba(0, 0, 0, 0.25),
+        rgba(0, 0, 0, 0.1)
+    );
+}
+
+.tx-category-banner-overlay {
+    position: absolute;
+  inset: 0;
+    z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 32px;
+    color: #fff;
+}
+
+.tx-category-banner-overlay h1 {
+    margin: 0;
+    font-size: 42px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tx-category-banner-overlay p {
+    margin: 8px 0 0;
+    max-width: 600px;
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .tx-category-banner {
+    aspect-ratio: 3 / 2;
+    }
+
+    .tx-category-banner-overlay {
+    padding: 20px;
+    }
+
+    .tx-category-banner-overlay h1 {
+        font-size: 28px;
+    }
+}
+/* =========================================================
+   TOMMY.X INSTAGRAM
+   ========================================================= */
+
+.tx-instagram-section {
+    padding: 90px 0 100px;
+    background: #f4f2ee;
+}
+
+.tx-instagram-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 42px;
+}
+
+.tx-instagram-eyebrow {
+    margin-bottom: 12px;
+
+    color: var(--tx-orange);
+
+    font-family: var(--tx-font-body);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .25em;
+    text-transform: uppercase;
+}
+
+.tx-instagram-title {
+    margin: 0;
+
+    color: var(--tx-black);
+
+    font-family: var(--tx-font-display);
+
+    font-size: clamp(48px, 5vw, 78px);
+    font-weight: 400;
+
+    line-height: .9;
+    letter-spacing: .01em;
+}
+
+.tx-instagram-follow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+
+    padding-bottom: 9px;
+
+    border-bottom: 1px solid var(--tx-black);
+
+    color: var(--tx-black);
+
+    font-family: var(--tx-font-body);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .16em;
+
+    text-decoration: none;
+    text-transform: uppercase;
+
+    transition:
+        color .25s ease,
+        border-color .25s ease;
+}
+
+.tx-instagram-follow i {
+    font-size: 15px;
+}
+
+.tx-instagram-follow:hover {
+    color: var(--tx-orange);
+    border-color: var(--tx-orange);
+}
+
+
+/* =========================================================
+   INSTAGRAM GRID
+   ========================================================= */
+
+.tx-instagram-grid {
+    display: grid;
+
+    grid-template-columns: repeat(6, 1fr);
+
+    gap: 7px;
+}
+
+.tx-instagram-card {
+    position: relative;
+
+    display: block;
+
+    aspect-ratio: 1 / 1;
+
+    overflow: hidden;
+
+    background: #ddd9d2;
+
+    text-decoration: none;
+}
+
+.tx-instagram-card img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform .6s cubic-bezier(.2,.7,.2,1),
+        filter .4s ease;
+}
+
+
+/* Dark overlay */
+
+.tx-instagram-card::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 1;
+
+    background:
+        linear-gradient(
+            180deg,
+            transparent 35%,
+            rgba(0,0,0,.72)
+        );
+
+    opacity: 0;
+
+    transition: opacity .35s ease;
+}
+
+
+/* Hover image */
+
+.tx-instagram-card:hover img {
+    transform: scale(1.07);
+}
+
+.tx-instagram-card:hover::after {
+    opacity: 1;
+}
+
+
+/* =========================================================
+   INSTAGRAM OVERLAY
+   ========================================================= */
+
+.tx-instagram-overlay {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 18px;
+
+    color: #fff;
+
+    opacity: 0;
+
+    transform: translateY(10px);
+
+    transition:
+        opacity .35s ease,
+        transform .35s ease;
+}
+
+.tx-instagram-card:hover .tx-instagram-overlay {
+    opacity: 1;
+
+    transform: translateY(0);
+}
+
+.tx-instagram-overlay-icon {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    border: 1px solid rgba(255,255,255,.5);
+
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.25);
+
+    backdrop-filter: blur(8px);
+
+    font-size: 14px;
+}
+
+.tx-instagram-overlay span {
+    max-width: 170px;
+
+    overflow: hidden;
+
+    color: #fff;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    line-height: 1.4;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   NO IMAGE
+   ========================================================= */
+
+.tx-instagram-no-image {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #e4e0da;
+
+    color: var(--tx-orange);
+
+    font-size: 32px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.tx-instagram-empty-state {
+    min-height: 260px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #ddd9d2;
+
+    text-align: center;
+}
+
+.tx-instagram-empty-state > i {
+    margin-bottom: 15px;
+
+    color: var(--tx-orange);
+
+    font-size: 30px;
+}
+
+.tx-instagram-empty-state p {
+    margin: 0 0 22px;
+
+    color: #777;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .tx-instagram-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .tx-instagram-section {
+        padding: 65px 0 70px;
+    }
+
+    .tx-instagram-head {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 20px;
+    }
+
+    .tx-instagram-title {
+        font-size: 48px;
+    }
+
+    .tx-instagram-grid {
+        grid-template-columns: repeat(2, 1fr);
+
+        gap: 5px;
+    }
+
+    .tx-instagram-overlay {
+        opacity: 1;
+
+        padding: 10px;
+
+        transform: none;
+    }
+
+    .tx-instagram-overlay-icon {
+        width: 30px;
+        height: 30px;
+
+        margin-left: auto;
+    }
+
+    .tx-instagram-overlay span {
+        display: none;
+    }
+
+}
+/* ---------- Checkout Choice ---------- */
+
+.tx-checkout-choice {
+  height: 100%;
+  padding: 40px 30px;
+  background: var(--tx-panel);
+  border: 1px solid var(--tx-line);
+  text-align: center;
+  transition: transform .25s ease, border-color .25s ease;
+}
+
+.tx-checkout-choice:hover {
+  transform: translateY(-4px);
+  border-color: var(--tx-orange);
+}
+
+.tx-checkout-choice-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 22px;
+  border: 1px solid var(--tx-black);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.tx-checkout-choice h3 {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+}
+
+.tx-checkout-choice p {
+  color: var(--tx-grey);
+  font-size: .9rem;
+  min-height: 48px;
+  margin-bottom: 28px;
+}
+.tx-checkout-choice-card {
+    border: 1px solid rgba(20, 20, 20, 0.12);
+    padding: 36px 30px;
+    text-align: center;
+    background: #fff;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.tx-checkout-choice-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, .08);
+}
+
+.tx-checkout-choice-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #141414;
+    color: #fff;
+    font-size: 24px;
+}
+
+.tx-checkout-choice-card h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.tx-checkout-choice-card p {
+    color: #777;
+    font-size: .95rem;
+    line-height: 1.6;
+    min-height: 48px;
+    margin-bottom: 25px;
 }

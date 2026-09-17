@@ -5,263 +5,1928 @@
 
 {% block content %}
 
-<section class="tx-hero" style="background-image: url('{{ hero_image }}');">
-  <div class="tx-hero-inner">
-    <div class="tx-hero-sub">MEN&nbsp;·&nbsp;PREMIUM</div>
+<style>
 
-    <h1 class="tx-hero-title">
-      TOMMY<span style="color:var(--tx-orange)">.X</span>
-    </h1>
+  /* =========================================================
+     TOMMY.X HERO — CLEAN PREMIUM BLACK / ORANGE
+     Keeps the site's existing font. No font-family override.
+     ========================================================= */
 
-    <a href="{% url 'products:new_arrivals' %}" class="tx-hero-cta">
-      Shop New Arrivals
-      <i class="bi bi-arrow-right"></i>
-    </a>
-  </div>
-</section>
+  .tx-xhero {
+    --hero-orange: #ff5a1f;
+    --hero-orange-bright: #ff6a2a;
+    --hero-black: #080808;
+    --hero-white: #ffffff;
 
-<section class="tx-section">
-  <div class="container">
-    <div class="tx-section-head" data-aos>
-      <h2 class="tx-section-title">Shop by Category</h2>
-    </div>
+    position: relative;
+    min-height: min(760px, 88vh);
+    display: flex;
+    align-items: center;
+    isolation: isolate;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        circle at 78% 48%,
+        rgba(255, 90, 31, 0.22) 0,
+        rgba(255, 90, 31, 0.10) 18%,
+        rgba(255, 90, 31, 0.035) 34%,
+        transparent 55%
+      ),
+      linear-gradient(
+        115deg,
+        #050505 0%,
+        #0a0a0a 46%,
+        #130a07 72%,
+        #090909 100%
+      );
+  }
 
-    <div class="row g-3">
-      {% for cat in categories %}
-      <div class="col-6 col-lg-4" data-aos>
-        <a href="{{ cat.get_absolute_url }}" class="tx-cat-tile">
-          <img
-            src="https://placehold.co/500x650/141414/e85d1f?text={{ cat.name|urlencode }}"
-            alt="{{ cat.name }}"
-          >
-          <span class="tx-cat-tile-label">{{ cat.name }}</span>
-        </a>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+  .tx-xhero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(255,255,255,.035) 1px,
+        transparent 1px
+      ) 0 0 / 92px 100%,
+      linear-gradient(
+        0deg,
+        rgba(255,255,255,.025) 1px,
+        transparent 1px
+      ) 0 0 / 100% 92px;
+    mask-image: linear-gradient(
+      90deg,
+      #000 0%,
+      rgba(0,0,0,.8) 55%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
 
-<section class="tx-section tx-section-alt">
-  <div class="container">
-    <div class="tx-section-head" data-aos>
-      <h2 class="tx-section-title">Featured Products</h2>
-      <a href="{% url 'products:new_arrivals' %}" class="tx-section-link">View All</a>
-    </div>
+  .tx-xhero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -4;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(0,0,0,.98) 0%,
+        rgba(0,0,0,.86) 40%,
+        rgba(0,0,0,.50) 68%,
+        rgba(0,0,0,.82) 100%
+      );
+    pointer-events: none;
+  }
 
-    <div class="row g-4">
-      {% for product in featured %}
-      <div class="col-6 col-lg-3">
-        {% include 'partials/product_card.html' %}
-      </div>
-      {% empty %}
-      <p class="text-muted">
-        Featured products will appear here once added in the admin.
-      </p>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+  .tx-xhero-bg::after {
+    content: "";
+    position: absolute;
+    width: 46vw;
+    height: 46vw;
+    max-width: 720px;
+    max-height: 720px;
+    right: -13vw;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(255,90,31,.28) 0%,
+      rgba(255,90,31,.12) 25%,
+      rgba(255,90,31,.035) 48%,
+      transparent 70%
+    );
+    filter: blur(8px);
+    animation: txHeroPulse 6s ease-in-out infinite;
+  }
 
-<section class="tx-section">
-  <div class="container">
-    <div class="row align-items-center g-4">
+  .tx-xhero-glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(2px);
+    z-index: -2;
+  }
 
-      <div class="col-lg-6" data-aos>
-        <img
-          src="https://placehold.co/900x600/f4f2ee/141414?text=TOMMY.X+Offer"
-          class="img-fluid rounded"
-          alt="Offer"
-        >
-      </div>
+  .tx-xhero-glow-1 {
+    width: 360px;
+    height: 360px;
+    right: 9%;
+    top: 12%;
+    background: radial-gradient(
+      circle,
+      rgba(255,90,31,.16),
+      transparent 68%
+    );
+    animation: txHeroFloat 8s ease-in-out infinite;
+  }
 
-      <div class="col-lg-6" data-aos>
-        <div class="tx-badge-pill mb-3">Limited Time</div>
+  .tx-xhero-glow-2 {
+    width: 220px;
+    height: 220px;
+    right: 28%;
+    bottom: -80px;
+    background: radial-gradient(
+      circle,
+      rgba(255,90,31,.10),
+      transparent 70%
+    );
+    animation: txHeroFloat 10s ease-in-out infinite reverse;
+  }
 
-        <h2 class="tx-section-title mb-3">
-          Up to 40% Off Selected Styles
-        </h2>
+  .tx-xhero-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: .42;
+    background:
+      linear-gradient(
+        90deg,
+        transparent 0,
+        transparent calc(50% - 1px),
+        rgba(255,90,31,.12) 50%,
+        transparent calc(50% + 1px)
+      );
+    pointer-events: none;
+  }
 
-        <p class="text-muted mb-4">
-          Refresh your wardrobe with premium shirts, pants and tees —
-          pan-India delivery, secure online payment.
+  .tx-xhero-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(255,255,255,.08) 25%,
+      rgba(255,90,31,.20) 50%,
+      rgba(255,255,255,.08) 75%,
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .tx-xhero-line-left {
+    left: max(26px, calc((100vw - 1320px) / 2));
+  }
+
+  .tx-xhero-line-right {
+    right: max(26px, calc((100vw - 1320px) / 2));
+  }
+
+  .tx-xhero-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+
+  .tx-xhero-content {
+    width: min(760px, 100%);
+    padding: 118px 0 105px;
+  }
+
+  .tx-xhero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 25px;
+    color: rgba(255,255,255,.66);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .27em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .tx-xhero-eyebrow > span:first-child {
+    width: 54px;
+    height: 2px;
+    flex: 0 0 54px;
+    background: var(--hero-orange);
+    box-shadow: 0 0 18px rgba(255,90,31,.38);
+  }
+
+  .tx-xhero-title {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: nowrap;
+    margin: 0;
+    color: var(--hero-white);
+    font-size: clamp(76px, 11vw, 156px);
+    font-weight: 900;
+    line-height: .80;
+    letter-spacing: -.075em;
+    white-space: nowrap;
+    text-rendering: geometricPrecision;
+  }
+
+  .tx-xhero-tommy {
+    color: #fff;
+  }
+
+  .tx-xhero-x {
+    color: var(--hero-orange);
+    margin-left: .025em;
+    text-shadow: 0 0 30px rgba(255,90,31,.16);
+  }
+
+  .tx-xhero-accent-line {
+    position: relative;
+    width: min(460px, 72%);
+    height: 2px;
+    margin: 43px 0 28px;
+    background: rgba(255,255,255,.13);
+    overflow: hidden;
+  }
+
+  .tx-xhero-accent-line span {
+    display: block;
+    width: 31%;
+    height: 100%;
+    margin-left: 0;
+    background: var(--hero-orange);
+    box-shadow: 0 0 16px rgba(255,90,31,.55);
+    animation: txHeroLine 3.5s ease-in-out infinite;
+  }
+
+  .tx-xhero-description {
+    max-width: 650px;
+    margin: 0 0 34px;
+    color: rgba(255,255,255,.70);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.75;
+    letter-spacing: 0;
+  }
+
+  .tx-xhero-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .tx-xhero-primary,
+  .tx-xhero-secondary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 56px;
+    padding: 0 27px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    overflow: hidden;
+    transition:
+      transform .3s ease,
+      background .3s ease,
+      border-color .3s ease,
+      color .3s ease,
+      box-shadow .3s ease;
+  }
+
+  .tx-xhero-primary {
+    color: #fff;
+    background: var(--hero-orange);
+    border: 1px solid var(--hero-orange);
+    box-shadow: 0 12px 35px rgba(255,90,31,.18);
+  }
+
+  .tx-xhero-primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-105%);
+    background: linear-gradient(
+      100deg,
+      transparent,
+      rgba(255,255,255,.22),
+      transparent
+    );
+    transition: transform .55s ease;
+  }
+
+  .tx-xhero-primary span,
+  .tx-xhero-primary i {
+    position: relative;
+    z-index: 1;
+  }
+
+  .tx-xhero-primary:hover {
+    color: #fff;
+    background: var(--hero-orange-bright);
+    border-color: var(--hero-orange-bright);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(255,90,31,.27);
+  }
+
+  .tx-xhero-primary:hover::before {
+    transform: translateX(105%);
+  }
+
+  .tx-xhero-primary i,
+  .tx-xhero-secondary i {
+    transition: transform .3s ease;
+  }
+
+  .tx-xhero-primary:hover i {
+    transform: translate(3px, -3px);
+  }
+
+  .tx-xhero-secondary {
+    color: rgba(255,255,255,.90);
+    background: rgba(255,255,255,.015);
+    border: 1px solid rgba(255,255,255,.22);
+    backdrop-filter: blur(8px);
+  }
+
+  .tx-xhero-secondary:hover {
+    color: #fff;
+    border-color: rgba(255,90,31,.70);
+    background: rgba(255,90,31,.08);
+    transform: translateY(-3px);
+  }
+
+  .tx-xhero-secondary:hover i {
+    transform: translateX(4px);
+    color: var(--hero-orange);
+  }
+
+  .tx-xhero-info {
+    display: flex;
+    align-items: center;
+    gap: 23px;
+    margin-top: 54px;
+  }
+
+  .tx-xhero-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .tx-xhero-info-item strong {
+    color: var(--hero-orange);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: .08em;
+  }
+
+  .tx-xhero-info-item span {
+    color: rgba(255,255,255,.48);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.55;
+    letter-spacing: .16em;
+  }
+
+  .tx-xhero-info-divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(255,255,255,.13);
+  }
+
+  .tx-xhero-side {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    right: max(28px, calc((100vw - 1320px) / 2));
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255,255,255,.34);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    writing-mode: vertical-rl;
+    text-transform: uppercase;
+    transform: translateY(-50%);
+  }
+
+  .tx-xhero-side i {
+    display: block;
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      var(--hero-orange),
+      transparent
+    );
+  }
+
+  .tx-xhero-scroll {
+    position: absolute;
+    z-index: 3;
+    right: max(28px, calc((100vw - 1320px) / 2));
+    bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    color: rgba(255,255,255,.34);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .20em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+  }
+
+  .tx-xhero-scroll > div {
+    position: relative;
+    width: 1px;
+    height: 42px;
+    overflow: hidden;
+    background: rgba(255,255,255,.13);
+  }
+
+  .tx-xhero-scroll i {
+    position: absolute;
+    top: -42px;
+    left: 0;
+    width: 1px;
+    height: 20px;
+    background: var(--hero-orange);
+    animation: txHeroScroll 2s ease-in-out infinite;
+  }
+
+  @keyframes txHeroPulse {
+    0%, 100% { opacity: .72; transform: translateY(-50%) scale(1); }
+    50% { opacity: 1; transform: translateY(-50%) scale(1.06); }
+  }
+
+  @keyframes txHeroFloat {
+    0%, 100% { transform: translate3d(0,0,0); }
+    50% { transform: translate3d(-18px,12px,0); }
+  }
+
+  @keyframes txHeroLine {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(220%); }
+  }
+
+  @keyframes txHeroScroll {
+    0% { transform: translateY(0); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(64px); opacity: 0; }
+  }
+
+  @media (max-width: 991px) {
+    .tx-xhero {
+      min-height: 76vh;
+    }
+
+    .tx-xhero-content {
+      padding: 100px 0 90px;
+    }
+
+    .tx-xhero-title {
+      font-size: clamp(70px, 13vw, 120px);
+    }
+
+    .tx-xhero-side {
+      display: none;
+    }
+
+    .tx-xhero-scroll {
+      right: 22px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .tx-xhero {
+      min-height: 720px;
+      align-items: flex-start;
+    }
+
+    .tx-xhero::before {
+      background-size: 65px 100%, 100% 65px;
+      opacity: .55;
+    }
+
+    .tx-xhero-line-left {
+      left: 18px;
+    }
+
+    .tx-xhero-line-right {
+      right: 18px;
+    }
+
+    .tx-xhero-container {
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+
+    .tx-xhero-content {
+      padding: 105px 0 75px;
+    }
+
+    .tx-xhero-eyebrow {
+      gap: 10px;
+      margin-bottom: 22px;
+      font-size: 9px;
+      letter-spacing: .20em;
+    }
+
+    .tx-xhero-eyebrow > span:first-child {
+      width: 34px;
+      flex-basis: 34px;
+    }
+
+    .tx-xhero-title {
+      font-size: clamp(64px, 19vw, 100px);
+      line-height: .82;
+      letter-spacing: -.07em;
+    }
+
+    .tx-xhero-accent-line {
+      width: 72%;
+      margin: 34px 0 24px;
+    }
+
+    .tx-xhero-description {
+      max-width: 520px;
+      font-size: 14px;
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    .tx-xhero-actions {
+      width: 100%;
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .tx-xhero-primary,
+    .tx-xhero-secondary {
+      width: 100%;
+      min-height: 54px;
+    }
+
+    .tx-xhero-info {
+      gap: 13px;
+      margin-top: 38px;
+    }
+
+    .tx-xhero-info-divider {
+      height: 24px;
+    }
+
+    .tx-xhero-info-item {
+      gap: 6px;
+    }
+
+    .tx-xhero-info-item span {
+      font-size: 7px;
+      letter-spacing: .10em;
+    }
+
+    .tx-xhero-scroll {
+      display: none;
+    }
+
+    .tx-xhero-bg::after {
+      width: 90vw;
+      height: 90vw;
+      right: -45vw;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tx-xhero-bg::after,
+    .tx-xhero-glow-1,
+    .tx-xhero-glow-2,
+    .tx-xhero-accent-line span,
+    .tx-xhero-scroll i {
+      animation: none;
+    }
+
+    .tx-xhero-primary,
+    .tx-xhero-secondary {
+      transition: none;
+    }
+  }
+
+/* =========================================================
+     TOMMY.X PREMIUM HOMEPAGE
+     ========================================================= */
+
+  .tx-home {
+    overflow: hidden;
+    background: #fff;
+  }
+
+  /* ================= GLOBAL SECTIONS ================= */
+
+  .tx-premium-section {
+    padding: 95px 0;
+  }
+
+  .tx-premium-section-alt {
+    background: #f5f3ef;
+  }
+
+  .tx-premium-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 25px;
+    margin-bottom: 42px;
+  }
+
+  .tx-premium-kicker {
+    display: block;
+    margin-bottom: 9px;
+    color: var(--tx-orange);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+  }
+
+  .tx-premium-heading {
+    margin: 0;
+    color: #111;
+    font-size: clamp(30px, 4vw, 48px);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -.045em;
+  }
+
+  .tx-premium-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #111;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #111;
+    padding-bottom: 6px;
+    transition: all .25s ease;
+  }
+
+  .tx-premium-link:hover {
+    color: var(--tx-orange);
+    border-color: var(--tx-orange);
+  }
+
+  /* ================= CATEGORY ================= */
+
+  .tx-premium-category {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    background: #ddd;
+    aspect-ratio: 3 / 4;
+    text-decoration: none;
+  }
+
+  .tx-premium-category img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .65s cubic-bezier(.2,.7,.2,1);
+  }
+
+  .tx-premium-category::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 45%,
+      rgba(0,0,0,.7) 100%
+    );
+  }
+
+  .tx-premium-category:hover img {
+    transform: scale(1.07);
+  }
+
+  .tx-category-info {
+    position: absolute;
+    z-index: 2;
+    left: 22px;
+    right: 22px;
+    bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    color: #fff;
+  }
+
+  .tx-category-name {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+  }
+
+  .tx-category-arrow {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 50%;
+    transition: all .3s ease;
+  }
+
+  .tx-premium-category:hover .tx-category-arrow {
+    background: var(--tx-orange);
+    border-color: var(--tx-orange);
+    transform: rotate(-45deg);
+  }
+
+  /* ================= OFFER ================= */
+
+  .tx-premium-offer {
+    position: relative;
+    overflow: hidden;
+    background: #151515;
+    color: #fff;
+  }
+
+  .tx-offer-image {
+    position: relative;
+    min-height: 500px;
+    overflow: hidden;
+  }
+
+  .tx-offer-image img {
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    object-fit: cover;
+    transition: transform .7s ease;
+  }
+
+  .tx-premium-offer:hover .tx-offer-image img {
+    transform: scale(1.04);
+  }
+
+  .tx-offer-content {
+    padding: 65px;
+  }
+
+  .tx-offer-badge {
+    display: inline-flex;
+    padding: 8px 13px;
+    border: 1px solid rgba(255,255,255,.25);
+    color: var(--tx-orange);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .tx-offer-title {
+    color: #fff;
+    font-size: clamp(36px, 5vw, 65px);
+    line-height: .95;
+    font-weight: 800;
+    letter-spacing: -.05em;
+    margin-bottom: 22px;
+  }
+
+  .tx-offer-description {
+    max-width: 500px;
+    color: rgba(255,255,255,.62);
+    line-height: 1.8;
+    margin-bottom: 30px;
+  }
+
+  /* ================= STORY ================= */
+
+  .tx-story-image {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tx-story-image img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform .6s ease;
+  }
+
+  .tx-story-image:hover img {
+    transform: scale(1.03);
+  }
+
+  .tx-story-copy {
+    padding: 20px 30px 20px 0;
+  }
+
+  .tx-story-copy p {
+    max-width: 570px;
+    color: #666;
+    font-size: 17px;
+    line-height: 1.9;
+  }
+
+  .tx-story-number {
+    display: block;
+    margin-bottom: 15px;
+    color: #bbb;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .18em;
+  }
+
+  /* ================= REVIEWS ================= */
+
+  .tx-review-card {
+    height: 100%;
+    padding: 34px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.08);
+    transition: all .3s ease;
+  }
+
+  .tx-review-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 45px rgba(0,0,0,.08);
+  }
+
+  .tx-review-stars {
+    color: var(--tx-orange);
+    letter-spacing: 3px;
+    font-size: 14px;
+    margin-bottom: 25px;
+  }
+
+  .tx-review-text {
+    color: #333;
+    font-size: 16px;
+    line-height: 1.8;
+    min-height: 110px;
+  }
+
+  .tx-review-customer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+  }
+
+  .tx-review-avatar {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #111;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .tx-review-name {
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .tx-review-verified {
+    color: #777;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  /* ================= INSTAGRAM ================= */
+
+  .tx-instagram-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+  }
+
+  .tx-instagram-item {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    background: #ddd;
+  }
+
+  .tx-instagram-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .5s ease;
+  }
+
+  .tx-instagram-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+
+  .tx-instagram-item:hover img {
+    transform: scale(1.08);
+  }
+
+  .tx-instagram-item:hover .tx-instagram-overlay {
+    opacity: 1;
+  }
+
+  .tx-instagram-overlay i {
+    font-size: 26px;
+  }
+
+  /* ================= NEWSLETTER ================= */
+
+  .tx-premium-newsletter {
+    position: relative;
+    padding: 100px 20px;
+    background: #111;
+    text-align: center;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  .tx-premium-newsletter::before {
+    content: "TOMMY.X";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255,255,255,.025);
+    font-size: clamp(90px, 18vw, 250px);
+    font-weight: 900;
+    letter-spacing: -.08em;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .tx-newsletter-inner {
+    position: relative;
+    z-index: 2;
+  }
+
+  .tx-newsletter-heading {
+    color: #fff;
+    font-size: clamp(35px, 5vw, 60px);
+    font-weight: 800;
+    letter-spacing: -.05em;
+    margin-bottom: 15px;
+  }
+
+  .tx-newsletter-description {
+    color: rgba(255,255,255,.55);
+    margin-bottom: 32px;
+  }
+
+  .tx-newsletter-form {
+    max-width: 560px;
+    margin: auto;
+    display: flex;
+    gap: 8px;
+    padding: 6px;
+    background: #fff;
+  }
+
+  .tx-newsletter-form input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    padding: 14px 16px;
+    font-size: 14px;
+    background: transparent;
+  }
+
+  .tx-newsletter-form button {
+    flex-shrink: 0;
+    border: 0;
+    padding: 0 24px;
+    background: var(--tx-orange);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+  }
+
+  /* ================= RESPONSIVE ================= */
+
+  @media (max-width: 991px) {
+
+    .tx-premium-hero {
+      min-height: 70vh;
+    }
+
+    .tx-premium-section {
+      padding: 70px 0;
+    }
+
+    .tx-offer-content {
+      padding: 45px;
+    }
+
+    .tx-instagram-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+  }
+
+  @media (max-width: 767px) {
+
+    .tx-premium-hero {
+      min-height: 72vh;
+      background-position: center;
+    }
+
+    .tx-hero-content {
+      padding: 80px 20px;
+    }
+
+    .tx-premium-title {
+      font-size: clamp(54px, 18vw, 90px);
+    }
+
+    .tx-hero-description {
+      font-size: 15px;
+    }
+
+    .tx-hero-scroll {
+      display: none;
+    }
+
+    .tx-premium-head {
+      align-items: flex-start;
+      flex-direction: column;
+      margin-bottom: 30px;
+    }
+
+    .tx-offer-image,
+    .tx-offer-image img {
+      min-height: 330px;
+    }
+
+    .tx-offer-content {
+      padding: 38px 25px;
+    }
+
+    .tx-story-copy {
+      padding: 10px 0 25px;
+    }
+
+    .tx-story-copy p {
+      font-size: 15px;
+    }
+
+    .tx-review-card {
+      padding: 27px;
+    }
+
+    .tx-review-text {
+      min-height: auto;
+    }
+
+    .tx-instagram-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tx-premium-newsletter {
+      padding: 75px 20px;
+    }
+
+    .tx-newsletter-form {
+      flex-direction: column;
+      background: transparent;
+      padding: 0;
+    }
+
+    .tx-newsletter-form input {
+      background: #fff;
+      padding: 15px;
+    }
+
+    .tx-newsletter-form button {
+      min-height: 50px;
+    }
+
+  }
+</style>
+
+
+<div class="tx-home">
+<!-- =====================================================
+       TOMMY.X PREMIUM HERO
+       ===================================================== -->
+  <section class="tx-xhero" aria-label="TOMMY.X premium collection">
+
+    <div class="tx-xhero-bg" aria-hidden="true"></div>
+    <div class="tx-xhero-glow tx-xhero-glow-1" aria-hidden="true"></div>
+    <div class="tx-xhero-glow tx-xhero-glow-2" aria-hidden="true"></div>
+    <div class="tx-xhero-grid" aria-hidden="true"></div>
+
+    <div class="tx-xhero-line tx-xhero-line-left" aria-hidden="true"></div>
+    <div class="tx-xhero-line tx-xhero-line-right" aria-hidden="true"></div>
+
+    <div class="container tx-xhero-container">
+      <div class="tx-xhero-content" data-aos="fade-up">
+
+        <div class="tx-xhero-eyebrow">
+          <span aria-hidden="true"></span>
+          <span class="tx-xhero-eyebrow-text">MEN · PREMIUM COLLECTION</span>
+        </div>
+
+        <h1 class="tx-xhero-title">
+          <span class="tx-xhero-tommy">TOMMY</span><span class="tx-xhero-x">.X</span>
+        </h1>
+
+        <div class="tx-xhero-accent-line" aria-hidden="true">
+          <span></span>
+        </div>
+
+        <p class="tx-xhero-description">
+          Modern menswear designed around clean silhouettes,
+          premium fabrics and effortless everyday style.
         </p>
 
-        <a href="{% url 'core:offers' %}" class="tx-btn-primary d-inline-block">
-          Shop Offers
-        </a>
-      </div>
+        <div class="tx-xhero-actions">
+          <a href="{% url 'products:new_arrivals' %}" class="tx-xhero-primary">
+            <span>Shop New Arrivals</span>
+            <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+          </a>
 
-    </div>
-  </div>
-</section>
+          <a href="{% url 'products:new_arrivals' %}" class="tx-xhero-secondary">
+            <span>Explore Collection</span>
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
 
-<section class="tx-section tx-section-alt">
-  <div class="container">
-
-    <div class="tx-section-head" data-aos>
-      <h2 class="tx-section-title">New Arrivals</h2>
-      <a href="{% url 'products:new_arrivals' %}" class="tx-section-link">
-        View All
-      </a>
-    </div>
-
-    <div class="row g-4">
-      {% for product in new_arrivals %}
-      <div class="col-6 col-lg-3">
-        {% include 'partials/product_card.html' %}
-      </div>
-      {% empty %}
-      <p class="text-muted">
-        Mark products as "New Arrival" in the admin to feature them here.
-      </p>
-      {% endfor %}
-    </div>
-
-  </div>
-</section>
-
-<section class="tx-section">
-  <div class="container">
-
-    <div class="tx-section-head" data-aos>
-      <h2 class="tx-section-title">Best Sellers</h2>
-    </div>
-
-    <div class="row g-4">
-      {% for product in best_sellers %}
-      <div class="col-6 col-lg-3">
-        {% include 'partials/product_card.html' %}
-      </div>
-      {% empty %}
-      <p class="text-muted">
-        Add products in the admin to see them here.
-      </p>
-      {% endfor %}
-    </div>
-
-  </div>
-</section>
-
-<section class="tx-section tx-section-alt">
-  <div class="container">
-
-    <div class="tx-section-head" data-aos>
-      <h2 class="tx-section-title">Our Story</h2>
-    </div>
-
-    <div class="row align-items-center g-4">
-
-      <div class="col-lg-6" data-aos>
-        <p class="fs-5 text-muted">
-          TOMMY.X was built for men who dress with intent — clean silhouettes,
-          honest fabric, and a wardrobe that works as hard as you do.
-          Every piece is designed in-house and shipped pan-India,
-          with secure online payment.
-        </p>
-      </div>
-
-      <div class="col-lg-6" data-aos>
-        <img
-          src="https://placehold.co/900x600/141414/ffffff?text=Brand+Story"
-          class="img-fluid rounded"
-          alt="Brand story"
-        >
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<section class="tx-section">
-  <div class="container">
-
-    <div class="tx-section-head" data-aos>
-      <h2 class="tx-section-title">What Customers Say</h2>
-    </div>
-
-    <div class="row g-4">
-      {% for t in "123" %}
-      <div class="col-md-4" data-aos>
-        <div class="tx-testimonial">
-
-          <div class="text-warning mb-2">
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
+        <div class="tx-xhero-info" aria-label="TOMMY.X features">
+          <div class="tx-xhero-info-item">
+            <strong>01</strong>
+            <span>PREMIUM<br>QUALITY</span>
           </div>
 
-          <p class="mb-3">
-            "Fit is spot on and the fabric feels premium.
-            Delivery was quick across the country."
-          </p>
+          <div class="tx-xhero-info-divider" aria-hidden="true"></div>
 
-          <strong>Verified Buyer</strong>
+          <div class="tx-xhero-info-item">
+            <strong>02</strong>
+            <span>MODERN<br>FIT</span>
+          </div>
+
+          <div class="tx-xhero-info-divider" aria-hidden="true"></div>
+
+          <div class="tx-xhero-info-item">
+            <strong>03</strong>
+            <span>LIMITED<br>DROPS</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tx-xhero-side" aria-hidden="true">
+      <span>TOMMY.X</span>
+      <i></i>
+      <span>2026</span>
+    </div>
+
+    <div class="tx-xhero-scroll" aria-hidden="true">
+      <span>SCROLL TO EXPLORE</span>
+      <div><i></i></div>
+    </div>
+
+  </section>
+
+<!-- =====================================================
+       SHOP BY CATEGORY
+       ===================================================== -->
+
+  <section class="tx-premium-section">
+
+    <div class="container">
+
+      <div class="tx-premium-head">
+
+        <div>
+          <span class="tx-premium-kicker">
+            Explore
+          </span>
+
+          <h2 class="tx-premium-heading">
+            Shop by Category
+          </h2>
+        </div>
+
+        <a
+          href="{% url 'products:new_arrivals' %}"
+          class="tx-premium-link"
+        >
+          View Collection
+          <i class="bi bi-arrow-up-right"></i>
+        </a>
+
+      </div>
+
+
+      <div class="row row-cols-2 row-cols-lg-5 g-3">
+
+        {% for cat in categories %}
+
+        <div class="col" data-aos>
+
+          <a
+            href="{{ cat.get_absolute_url }}"
+            class="tx-premium-category"
+          >
+
+            {% if cat.image %}
+
+            <img
+              src="{{ cat.image.url }}"
+              alt="{{ cat.name }}"
+            >
+
+            {% else %}
+
+            <img
+              src="https://placehold.co/700x900/141414/e85d1f?text={{ cat.name|urlencode }}"
+              alt="{{ cat.name }}"
+            >
+
+            {% endif %}
+
+            <div class="tx-category-info">
+
+              <span class="tx-category-name">
+                {{ cat.name }}
+              </span>
+
+              <span class="tx-category-arrow">
+                <i class="bi bi-arrow-up-right"></i>
+              </span>
+
+            </div>
+
+          </a>
 
         </div>
+
+        {% endfor %}
+
       </div>
-      {% endfor %}
+
     </div>
 
-  </div>
-</section>
+  </section>
 
-<section class="tx-section tx-section-alt">
-  <div class="container">
 
-    <div class="tx-section-head" data-aos>
-      <h2 class="tx-section-title">@tommy.x on Instagram</h2>
-    </div>
+  <!-- =====================================================
+       FEATURED PRODUCTS
+       ===================================================== -->
 
-    <div class="row g-2">
-      {% for i in "123456" %}
-      <div class="col-6 col-lg-2">
-        <img
-          src="https://placehold.co/300x300/f4f2ee/141414?text=%40tommy.x"
-          class="img-fluid"
-          alt="Instagram post"
+  <section class="tx-premium-section tx-premium-section-alt">
+
+    <div class="container">
+
+      <div class="tx-premium-head">
+
+        <div>
+          <span class="tx-premium-kicker">
+            Curated for you
+          </span>
+
+          <h2 class="tx-premium-heading">
+            Featured Products
+          </h2>
+        </div>
+
+        <a
+          href="{% url 'products:new_arrivals' %}"
+          class="tx-premium-link"
         >
+          View All
+          <i class="bi bi-arrow-up-right"></i>
+        </a>
+
       </div>
-      {% endfor %}
+
+
+      <div class="row g-4">
+
+        {% for product in featured %}
+
+        <div class="col-6 col-lg-3" data-aos>
+
+          {% include 'partials/product_card.html' %}
+
+        </div>
+
+        {% empty %}
+
+        <div class="col-12">
+
+          <p class="text-muted">
+            Featured products will appear here once added
+            in the admin.
+          </p>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
     </div>
 
-  </div>
-</section>
+  </section>
 
-<section class="tx-newsletter">
+
+  <!-- =====================================================
+       OFFER
+       ===================================================== -->
+
+  {% if offer %}
+
+  <section class="tx-premium-section">
+
+    <div class="container">
+
+      <div class="tx-premium-offer">
+
+        <div class="row g-0 align-items-stretch">
+
+          <!-- Image -->
+
+          <div class="col-lg-6">
+
+            <div class="tx-offer-image">
+
+              {% if offer.image %}
+
+              <img
+                src="{{ offer.image.url }}"
+                alt="{{ offer.title }}"
+              >
+
+              {% else %}
+
+              <img
+                src="https://placehold.co/900x700/181818/ffffff?text=TOMMY.X"
+                alt="{{ offer.title }}"
+              >
+
+              {% endif %}
+
+            </div>
+
+          </div>
+
+
+          <!-- Content -->
+
+          <div class="col-lg-6 d-flex align-items-center">
+
+            <div class="tx-offer-content">
+
+              {% if offer.badge %}
+
+              <div class="tx-offer-badge">
+                {{ offer.badge }}
+              </div>
+
+              {% endif %}
+
+
+              {% if offer.title %}
+
+              <h2 class="tx-offer-title">
+                {{ offer.title }}
+              </h2>
+
+              {% endif %}
+
+
+              {% if offer.description %}
+
+              <p class="tx-offer-description">
+                {{ offer.description }}
+              </p>
+
+              {% endif %}
+
+
+              {% if offer.button_text and offer.button_url %}
+
+              <a
+                href="{{ offer.button_url }}"
+                class="tx-premium-btn"
+              >
+                {{ offer.button_text }}
+                <i class="bi bi-arrow-right"></i>
+              </a>
+
+              {% endif %}
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  {% endif %}
+
+
+  <!-- =====================================================
+       NEW ARRIVALS
+       ===================================================== -->
+
+  <section class="tx-premium-section tx-premium-section-alt">
+
+    <div class="container">
+
+      <div class="tx-premium-head">
+
+        <div>
+
+          <span class="tx-premium-kicker">
+            Just landed
+          </span>
+
+          <h2 class="tx-premium-heading">
+            New Arrivals
+          </h2>
+
+        </div>
+
+        <a
+          href="{% url 'products:new_arrivals' %}"
+          class="tx-premium-link"
+        >
+          View All
+          <i class="bi bi-arrow-up-right"></i>
+        </a>
+
+      </div>
+
+
+      <div class="row g-4">
+
+        {% for product in new_arrivals %}
+
+        <div class="col-6 col-lg-3" data-aos>
+
+          {% include 'partials/product_card.html' %}
+
+        </div>
+
+        {% empty %}
+
+        <div class="col-12">
+
+          <p class="text-muted">
+            Mark products as "New Arrival" in the admin
+            to feature them here.
+          </p>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       BEST SELLERS
+       ===================================================== -->
+
+  <section class="tx-premium-section">
+
+    <div class="container">
+
+      <div class="tx-premium-head">
+
+        <div>
+
+          <span class="tx-premium-kicker">
+            Customer favourites
+          </span>
+
+          <h2 class="tx-premium-heading">
+            Best Sellers
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="row g-4">
+
+        {% for product in best_sellers %}
+
+        <div class="col-6 col-lg-3" data-aos>
+
+          {% include 'partials/product_card.html' %}
+
+        </div>
+
+        {% empty %}
+
+        <div class="col-12">
+
+          <p class="text-muted">
+            Add products in the admin to see them here.
+          </p>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       OUR STORY
+       ===================================================== -->
+
+  {% if story %}
+
+  <section class="tx-premium-section tx-premium-section-alt">
+
+    <div class="container">
+
+      <div class="row align-items-center g-5">
+
+        <!-- Content -->
+
+        <div class="col-lg-5" data-aos>
+
+          <div class="tx-story-copy">
+
+            <span class="tx-story-number">
+              01 / OUR STORY
+            </span>
+
+            <span class="tx-premium-kicker">
+              The brand behind the style
+            </span>
+
+            <h2 class="tx-premium-heading mb-4">
+              {{ story.title }}
+            </h2>
+
+
+            {% if story.description %}
+
+            <p>
+              {{ story.description }}
+            </p>
+
+            {% endif %}
+
+          </div>
+
+        </div>
+
+
+        <!-- Image -->
+
+        <div class="col-lg-7" data-aos>
+
+          {% if story.image %}
+
+          <div class="tx-story-image">
+
+            <img
+              src="{{ story.image.url }}"
+              alt="{{ story.title }}"
+            >
+
+          </div>
+
+          {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  {% endif %}
+
+
+  <!-- =====================================================
+       CUSTOMER REVIEWS
+       ===================================================== -->
+
+  {% if reviews %}
+
+  <section class="tx-premium-section">
+
+    <div class="container">
+
+      <div class="tx-premium-head">
+
+        <div>
+
+          <span class="tx-premium-kicker">
+            Real customers
+          </span>
+
+          <h2 class="tx-premium-heading">
+            What Customers Say
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="row g-4">
+
+        {% for review in reviews %}
+
+        <div class="col-md-4" data-aos>
+
+          <div class="tx-review-card">
+
+            <!-- Stars -->
+
+            <div class="tx-review-stars">
+
+              {% for star in "12345" %}
+
+                {% if forloop.counter <= review.rating %}
+
+                  <i class="bi bi-star-fill"></i>
+
+                {% else %}
+
+                  <i class="bi bi-star"></i>
+
+                {% endif %}
+
+              {% endfor %}
+
+            </div>
+
+
+            <!-- Review -->
+
+            <p class="tx-review-text">
+              "{{ review.review }}"
+            </p>
+
+
+            <!-- Customer -->
+
+            <div class="tx-review-customer">
+
+              <div class="tx-review-avatar">
+
+                {{ review.customer_name|first|upper }}
+
+              </div>
+
+
+              <div>
+
+                <div class="tx-review-name">
+                  {{ review.customer_name }}
+                </div>
+
+
+                {% if review.is_verified %}
+
+                <div class="tx-review-verified">
+
+                  <i class="bi bi-patch-check-fill"></i>
+
+                  Verified Buyer
+
+                </div>
+
+                {% endif %}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+    </div>
+
+  </section>
+
+  {% endif %}
+
+
+  <!-- =====================================================
+     INSTAGRAM
+     ===================================================== -->
+
+<section class="tx-instagram-section">
+
   <div class="container">
 
-    <h2 class="tx-section-title mb-2">
-      Join the TOMMY.X List
-    </h2>
+    <div class="tx-instagram-head">
 
-    <p class="text-white-50 mb-4">
-      New drops, offers and restocks — straight to your inbox.
-    </p>
+      <div>
 
-    <form
-      class="d-flex justify-content-center flex-wrap gap-2"
-      action="{% url 'core:contact' %}"
-      method="get"
-    >
-      <input
-        type="email"
-        placeholder="Your email address"
-        required
+        <div class="tx-instagram-eyebrow">
+          FOLLOW THE STYLE
+        </div>
+
+        <h2 class="tx-instagram-title">
+          @tommy.x on Instagram
+        </h2>
+
+      </div>
+
+      <a
+        href="https://www.instagram.com/tommy.x__?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw=="
+        class="tx-instagram-follow"
+        target="_blank"
+        rel="noopener noreferrer"
       >
+        <span>FOLLOW US</span>
+        <i class="bi bi-instagram"></i>
+      </a>
 
-      <button
-        type="submit"
-        class="tx-btn-primary"
-        style="background:var(--tx-orange);border-color:var(--tx-orange);"
-      >
-        Subscribe
-      </button>
-    </form>
+    </div>
+
+
+    {% if instagram_posts %}
+
+      <div class="tx-instagram-grid">
+
+        {% for post in instagram_posts %}
+
+          <a
+            href="{{ post.instagram_url }}"
+            class="tx-instagram-card"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View TOMMY.X Instagram post"
+          >
+
+            {% if post.image %}
+
+              <img
+                src="{{ post.image.url }}"
+                alt="{{ post.caption|default:'TOMMY.X Instagram post' }}"
+                loading="lazy"
+              >
+
+            {% else %}
+
+              <div class="tx-instagram-no-image">
+                <i class="bi bi-instagram"></i>
+              </div>
+
+            {% endif %}
+
+
+            <div class="tx-instagram-overlay">
+
+              <div class="tx-instagram-overlay-icon">
+                <i class="bi bi-instagram"></i>
+              </div>
+
+              {% if post.caption %}
+                <span>{{ post.caption }}</span>
+              {% endif %}
+
+            </div>
+
+          </a>
+
+        {% endfor %}
+
+      </div>
+
+    {% else %}
+
+      <div class="tx-instagram-empty-state">
+
+        <i class="bi bi-instagram"></i>
+
+        <p>
+          Follow @tommy.x for the latest
+          collections and updates.
+        </p>
+
+        <a
+          href="https://www.instagram.com/tommy.x/"
+          class="tx-btn-primary"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Visit Instagram
+        </a>
+
+      </div>
+
+    {% endif %}
 
   </div>
+
 </section>
+
+
+  <!-- =====================================================
+       NEWSLETTER
+       ===================================================== -->
+
+  <section class="tx-premium-newsletter">
+
+    <div class="container">
+
+      <div class="tx-newsletter-inner" data-aos>
+
+        <span class="tx-premium-kicker">
+          Stay in the loop
+        </span>
+
+        <h2 class="tx-newsletter-heading">
+          Join the TOMMY.X List
+        </h2>
+
+        <p class="tx-newsletter-description">
+          New drops, exclusive offers and restocks —
+          straight to your inbox.
+        </p>
+
+
+        <form
+          class="tx-newsletter-form"
+          action="{% url 'core:contact' %}"
+          method="get"
+        >
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email address"
+            aria-label="Email address"
+            required
+          >
+
+          <button type="submit">
+            Subscribe
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+</div>
+
 
 {% endblock %}

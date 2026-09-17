@@ -1,24 +1,860 @@
 {% load humanize %}
+
+<style>
+
+/* =========================================================
+   TOMMY.X — ULTRA PREMIUM PRODUCT CARD
+   ========================================================= */
+
+.tx-product-card {
+    position: relative;
+    width: 100%;
+    background: transparent;
+    font-family: inherit;
+}
+
+
+/* =========================================================
+   IMAGE CONTAINER
+   ========================================================= */
+
+.tx-product-media {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background: #eeeae4;
+}
+
+
+/* IMAGE LINK */
+
+.tx-product-media-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    overflow: hidden;
+}
+
+
+/* IMAGE */
+
+.tx-product-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+
+    object-fit: cover;
+
+    transform: scale(1.001);
+
+    transition:
+        transform .9s cubic-bezier(.16,1,.3,1),
+        filter .6s ease;
+}
+
+
+/* HOVER IMAGE */
+
+.tx-product-card:hover .tx-product-media img {
+    transform: scale(1.075);
+    filter: brightness(.92);
+}
+
+
+/* =========================================================
+   CINEMATIC OVERLAY
+   ========================================================= */
+
+.tx-product-media::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0,0,0,.16) 0%,
+            transparent 25%,
+            transparent 58%,
+            rgba(0,0,0,.30) 100%
+        );
+
+    opacity: .7;
+
+    transition: opacity .4s ease;
+}
+
+.tx-product-card:hover .tx-product-media::before {
+    opacity: 1;
+}
+
+
+/* =========================================================
+   TOP LEFT — SALE LABEL
+   ========================================================= */
+
+.tx-product-sale {
+    position: absolute;
+    z-index: 5;
+    top: 14px;
+    left: 14px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 8px 11px;
+
+    background: #111;
+    color: #fff;
+
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 1.1px;
+
+    text-transform: uppercase;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.14);
+}
+
+.tx-product-sale i {
+    color: #ff3b30;
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   TOP RIGHT — WISHLIST
+   ========================================================= */
+
+.tx-product-wishlist {
+    position: absolute;
+    z-index: 8;
+    top: 12px;
+    right: 12px;
+}
+
+
+.tx-wish-btn {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255,255,255,.65);
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.88);
+    color: #171717;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.12);
+
+    transition:
+        transform .3s cubic-bezier(.16,1,.3,1),
+        background .3s ease,
+        color .3s ease,
+        border-color .3s ease;
+}
+
+
+.tx-wish-btn:hover {
+    transform: rotate(-8deg) scale(1.1);
+
+    background: #111;
+    border-color: #111;
+    color: #fff;
+}
+
+
+/* =========================================================
+   BOTTOM QUICK SHOP PANEL
+   ========================================================= */
+
+.tx-product-quick {
+    position: absolute;
+    z-index: 7;
+
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+
+    transform: translateY(65px);
+
+    opacity: 0;
+
+    transition:
+        transform .45s cubic-bezier(.16,1,.3,1),
+        opacity .35s ease;
+}
+
+
+.tx-product-card:hover .tx-product-quick {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+
+.tx-product-quick-link {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    min-height: 43px;
+
+    background: rgba(255,255,255,.95);
+    color: #111;
+
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+
+    text-decoration: none;
+    text-transform: uppercase;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.16);
+
+    transition:
+        background .25s ease,
+        color .25s ease;
+}
+
+
+.tx-product-quick-link:hover {
+    background: #111;
+    color: #fff;
+}
+
+
+.tx-product-quick-link i {
+    font-size: 12px;
+
+    transition: transform .25s ease;
+}
+
+
+.tx-product-quick-link:hover i {
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   OUT OF STOCK
+   ========================================================= */
+
+.tx-product-out {
+    position: absolute;
+    z-index: 9;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255,255,255,.30);
+
+    backdrop-filter: blur(2px);
+}
+
+
+.tx-product-out span {
+    padding: 10px 15px;
+
+    background: #111;
+    color: #fff;
+
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   PRODUCT INFORMATION
+   ========================================================= */
+
+.tx-product-details {
+    position: relative;
+
+    padding: 14px 2px 0;
+}
+
+
+/* NAME ROW */
+
+.tx-product-name-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+
+.tx-product-name {
+    min-width: 0;
+    margin: 0;
+
+    line-height: 1.35;
+}
+
+
+.tx-product-name a {
+    color: #141414;
+
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: -.15px;
+
+    text-decoration: none;
+
+    transition: color .25s ease;
+}
+
+
+.tx-product-name a:hover {
+    color: #777;
+}
+
+
+/* =========================================================
+   PRICE
+   ========================================================= */
+
+.tx-product-pricing {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 7px;
+}
+
+
+.tx-product-current-price {
+    color: #111;
+
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: -.3px;
+}
+
+
+.tx-product-old-price {
+    color: #a4a4a4;
+
+    font-size: 10px;
+    font-weight: 500;
+
+    text-decoration: line-through;
+}
+
+
+/* =========================================================
+   DISCOUNT INFORMATION
+   ========================================================= */
+
+.tx-product-discount {
+    display: inline-flex;
+    align-items: center;
+
+    margin-top: 7px;
+
+    color: #777;
+
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .7px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-product-discount::before {
+    content: "";
+
+    width: 4px;
+    height: 4px;
+
+    margin-right: 6px;
+
+    border-radius: 50%;
+
+    background: #111;
+}
+
+
+/* =========================================================
+   BOTTOM META
+   ========================================================= */
+
+.tx-product-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 12px;
+    padding-top: 10px;
+
+    border-top: 1px solid #eaeaea;
+}
+
+
+.tx-product-availability {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #999;
+
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+.tx-availability-dot {
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: #777;
+}
+
+
+.tx-product-explore {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    color: #999;
+
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+
+    transition: color .25s ease;
+}
+
+
+.tx-product-card:hover .tx-product-explore {
+    color: #111;
+}
+
+
+.tx-product-explore i {
+    font-size: 9px;
+
+    transition: transform .25s ease;
+}
+
+
+.tx-product-card:hover .tx-product-explore i {
+    transform: translateX(3px);
+}
+
+
+/* =========================================================
+   PREMIUM CARD HOVER
+   ========================================================= */
+
+.tx-product-card::after {
+    content: "";
+
+    position: absolute;
+
+    left: 12%;
+    right: 12%;
+    bottom: -8px;
+
+    height: 18px;
+
+    background: rgba(0,0,0,.08);
+
+    filter: blur(18px);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity .4s ease;
+}
+
+
+.tx-product-card:hover::after {
+    opacity: .8;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .tx-product-media {
+        aspect-ratio: 3 / 4;
+    }
+
+    .tx-product-sale {
+        top: 9px;
+        left: 9px;
+
+        padding: 6px 8px;
+
+        font-size: 6.5px;
+    }
+
+    .tx-product-wishlist {
+        top: 8px;
+        right: 8px;
+    }
+
+    .tx-wish-btn {
+        width: 35px;
+        height: 35px;
+
+        font-size: 14px;
+    }
+
+    /*
+       On touch devices the hover quick-shop
+       is always visible.
+    */
+
+    .tx-product-quick {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .tx-product-quick-link {
+        min-height: 38px;
+        font-size: 7px;
+    }
+
+    .tx-product-details {
+        padding-top: 10px;
+    }
+
+    .tx-product-name a {
+        font-size: 11px;
+    }
+
+    .tx-product-current-price {
+        font-size: 12px;
+    }
+
+    .tx-product-old-price {
+        font-size: 9px;
+    }
+
+    .tx-product-bottom {
+        margin-top: 9px;
+        padding-top: 8px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .tx-product-media {
+        aspect-ratio: 3 / 4.2;
+    }
+
+    .tx-product-sale {
+        padding: 5px 7px;
+        font-size: 6px;
+    }
+
+    .tx-wish-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .tx-product-name a {
+        font-size: 10px;
+    }
+
+    .tx-product-current-price {
+        font-size: 11px;
+    }
+
+    .tx-product-bottom {
+        display: none;
+    }
+
+}
+
+</style>
+
+
 <div class="tx-product-card" data-aos>
-  <div class="tx-product-img-wrap">
-    {% if product.discount_percent > 0 %}<span class="tx-discount-tag">{{ product.discount_percent }}% OFF</span>{% endif %}
-    <form method="post" action="{% url 'wishlist:toggle' product.id %}">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <button type="submit" class="tx-wish-btn" aria-label="Toggle wishlist">
-        <i class="bi bi-heart"></i>
-      </button>
-    </form>
-    <a href="{{ product.get_absolute_url }}">
-      {% with img=product.primary_image %}
-        {% if img %}<img src="{{ img.image.url }}" alt="{{ product.name }}">{% else %}<img src="https://placehold.co/450x600/f4f2ee/141414?text={{ product.name|urlencode }}" alt="{{ product.name }}">{% endif %}
-      {% endwith %}
-    </a>
-    {% if not product.in_stock %}<div class="tx-outofstock-tag">Out of Stock</div>{% endif %}
-  </div>
-  <p class="tx-product-name"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></p>
-  <div>
-    <span class="tx-price">Rs.{{ product.price|intcomma }}</span>
-    {% if product.mrp > product.price %}<span class="tx-mrp">Rs.{{ product.mrp|intcomma }}</span>{% endif %}
-  </div>
+
+
+    <!-- =====================================================
+         PRODUCT MEDIA
+         ===================================================== -->
+
+    <div class="tx-product-media">
+
+
+        <!-- SALE BADGE -->
+
+        {% if product.discount_percent > 0 %}
+
+        <span class="tx-product-sale">
+
+            <i class="bi bi-lightning-charge-fill"></i>
+
+            {{ product.discount_percent }}% OFF
+
+        </span>
+
+        {% endif %}
+
+
+        <!-- WISHLIST -->
+
+        <div class="tx-product-wishlist">
+
+            <form
+                method="post"
+                action="{% url 'wishlist:toggle' product.id %}"
+            >
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="next"
+                    value="{{ request.get_full_path }}"
+                >
+
+                <button
+                    type="submit"
+                    class="tx-wish-btn"
+                    aria-label="Toggle wishlist"
+                    title="Add to wishlist"
+                >
+
+                    <i class="bi bi-heart"></i>
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- IMAGE -->
+
+        <a
+            href="{{ product.get_absolute_url }}"
+            class="tx-product-media-link"
+        >
+
+            {% with img=product.primary_image %}
+
+                {% if img %}
+
+                    <img
+                        src="{{ img.image.url }}"
+                        alt="{{ product.name }}"
+                        loading="lazy"
+                    >
+
+                {% else %}
+
+                    <img
+                        src="https://placehold.co/450x600/f4f2ee/141414?text={{ product.name|urlencode }}"
+                        alt="{{ product.name }}"
+                        loading="lazy"
+                    >
+
+                {% endif %}
+
+            {% endwith %}
+
+        </a>
+
+
+        <!-- QUICK SHOP -->
+
+        <div class="tx-product-quick">
+
+            <a
+                href="{{ product.get_absolute_url }}"
+                class="tx-product-quick-link"
+            >
+
+                Explore Product
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <!-- OUT OF STOCK -->
+
+        {% if not product.in_stock %}
+
+        <div class="tx-product-out">
+
+            <span>
+                Out of Stock
+            </span>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+
+    <!-- =====================================================
+         PRODUCT DETAILS
+         ===================================================== -->
+
+    <div class="tx-product-details">
+
+
+        <!-- PRODUCT NAME -->
+
+        <div class="tx-product-name-row">
+
+            <p class="tx-product-name">
+
+                <a href="{{ product.get_absolute_url }}">
+
+                    {{ product.name }}
+
+                </a>
+
+            </p>
+
+        </div>
+
+
+        <!-- PRICING -->
+
+        <div class="tx-product-pricing">
+
+            <span class="tx-product-current-price">
+
+                Rs.{{ product.price|intcomma }}
+
+            </span>
+
+
+            {% if product.mrp > product.price %}
+
+            <span class="tx-product-old-price">
+
+                Rs.{{ product.mrp|intcomma }}
+
+            </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- DISCOUNT INFO -->
+
+        {% if product.discount_percent > 0 %}
+
+        <div class="tx-product-discount">
+
+            Limited offer
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- BOTTOM INFORMATION -->
+
+        <div class="tx-product-bottom">
+
+
+            {% if product.in_stock %}
+
+            <div class="tx-product-availability">
+
+                <span class="tx-availability-dot"></span>
+
+                Available
+
+            </div>
+
+            {% else %}
+
+            <div class="tx-product-availability">
+
+                <span class="tx-availability-dot"></span>
+
+                Unavailable
+
+            </div>
+
+            {% endif %}
+
+
+            <div class="tx-product-explore">
+
+                View Details
+
+                <i class="bi bi-arrow-up-right"></i>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
 </div>
